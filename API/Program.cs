@@ -15,6 +15,15 @@ builder.Services.AddDbContext<DataContext>(opt =>
     }
 );
 
+builder.Services.AddCors(opt =>
+{
+    opt.AddPolicy("CorsPolicy", policy =>
+    {
+        policy.AllowAnyMethod().AllowAnyHeader().WithOrigins("http://localhost:3000");
+    }
+    );
+});
+
 var app = builder.Build(); //Build the APP
 
 // Configure the HTTP request pipeline.
@@ -24,6 +33,8 @@ if (app.Environment.IsDevelopment()) // Middleware for Swagger for Development E
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("CorsPolicy");
 
 app.UseHttpsRedirection(); // Middleware for Https Redirection 
 
