@@ -8,6 +8,7 @@ import ActivityList from "./ActivityList";
 interface Props {
     activities: Activity[]
     selectedActivity: Activity | undefined
+    submitting: boolean
     selectActivity: (id: string) => void
     cancelSelectActivity: () => void
     editMode: boolean
@@ -18,13 +19,14 @@ interface Props {
 }
 
 export default function ({ activities, selectActivity
-    , cancelSelectActivity, selectedActivity, editMode, openForm, closeForm, createOrEdit, deleteActivity }: Props) {
+    , cancelSelectActivity, selectedActivity, editMode, openForm, closeForm, createOrEdit, deleteActivity, submitting }: Props) {
     return (
         <Grid>
             <Grid.Column width="10">
                 <ActivityList activities={activities}
                     selectActivity={selectActivity}
                     deleteActivity={deleteActivity}
+                    submitting={submitting}
                 />
             </Grid.Column>
             <Grid.Column width="6">
@@ -35,7 +37,12 @@ export default function ({ activities, selectActivity
                         openForm={openForm}
                     />}
                 {editMode &&
-                    <ActivityForm closeForm={closeForm} activity={selectedActivity} createOrEdit={createOrEdit} />}
+                    <ActivityForm
+                        closeForm={closeForm}
+                        activity={selectedActivity}
+                        createOrEdit={createOrEdit}
+                        submitting={submitting}
+                    />}
             </Grid.Column>
         </Grid>
     )
