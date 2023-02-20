@@ -2,8 +2,6 @@ import { makeAutoObservable, runInAction } from "mobx";
 import agent from "../api/agent";
 import { Activity } from "../models/activity";
 import { v4 as uuid } from "uuid"
-import { keyboard } from "@testing-library/user-event/dist/keyboard";
-
 
 export default class ActivityStore {
 

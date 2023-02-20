@@ -1,4 +1,5 @@
 using API.Extensions;
+using API.Middleware;
 using Application.Activities;
 using Application.Core;
 using MediatR;
@@ -18,6 +19,8 @@ var app = builder.Build(); //Build the APP
 
 // Configure the HTTP request pipeline.
 //Add Any middleware in this section
+app.UseMiddleware<ExceptionMiddleware>();
+
 if (app.Environment.IsDevelopment()) // Middleware for Swagger for Development Environment
 {
     app.UseSwagger();
