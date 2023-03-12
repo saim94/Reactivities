@@ -9,9 +9,9 @@ export default observer(function () {
 
     const { activityStore } = useStore();
     const { groupedActivities } = activityStore;
-
+    debugger;
     return (
-
+        
         <>
             {groupedActivities.map(([group, activities]) => (
 

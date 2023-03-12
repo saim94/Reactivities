@@ -15,7 +15,6 @@ function App() {
     const { commonStore, userStore } = useStore();
 
     useEffect(() => {
-        debugger;
         if (commonStore.token) {
             userStore.getUser().finally(() => commonStore.setAppLoaded())
         } else {
