@@ -1,6 +1,4 @@
 import { makeAutoObservable, runInAction } from "mobx";
-import { tokenToString } from "typescript";
-import { debug } from "util";
 import agent from "../api/agent";
 import { User, UserFormValues } from "../models/user";
 import { router } from "../router/Routes";
@@ -62,5 +60,14 @@ export default class UserStore {
 
     setImage = (image: string) => {
         if (this.user) this.user.image = image;
+    }
+
+    //setDisplayname = (displayName: string) => {
+    //    if (this.user)
+    //        this.user.displayName = displayName;
+    //}
+
+    setDisplayName = (name: string) => {
+        if (this.user) this.user.displayName = name;
     }
 }
