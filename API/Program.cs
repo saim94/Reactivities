@@ -43,12 +43,16 @@ app.UseCors("CorsPolicy");
 app.UseHttpsRedirection(); // Middleware for Https Redirection 
 
 app.UseAuthentication(); //Middleware for Authentication(must be before Authorization)
-
 app.UseAuthorization(); // Middleware for Authorization 
+
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.MapControllers(); // Middleware for Map our Controllers
 
 app.MapHub<ChatHub>("/chat");
+
+app.MapFallbackToController("Index", "Fallback");
 
 using var scop = app.Services.CreateScope();
 var service = scop.ServiceProvider;
