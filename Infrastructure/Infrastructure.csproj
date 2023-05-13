@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<ItemGroup>
 		<PackageReference Include="CloudinaryDotNet" Version="1.20.0" />
@@ -12,7 +12,6 @@
 		<TargetFramework>net7.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>disable</Nullable>
-		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
 	</PropertyGroup>
 
 </Project>
