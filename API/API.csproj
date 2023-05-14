@@ -10,37 +10,9 @@
 
 	<ItemGroup>
 		<Compile Remove="%2a%2a\**" />
-		<Compile Remove="Controllers\**" />
-		<Compile Remove="DTOs\**" />
-		<Compile Remove="Extensions\**" />
-		<Compile Remove="Middleware\**" />
-		<Compile Remove="Services\**" />
-		<Compile Remove="SignalR\**" />
-		<Compile Remove="wwwroot\**" />
 		<Content Remove="%2a%2a\**" />
-		<Content Remove="Controllers\**" />
-		<Content Remove="DTOs\**" />
-		<Content Remove="Extensions\**" />
-		<Content Remove="Middleware\**" />
-		<Content Remove="Services\**" />
-		<Content Remove="SignalR\**" />
-		<Content Remove="wwwroot\**" />
 		<EmbeddedResource Remove="%2a%2a\**" />
-		<EmbeddedResource Remove="Controllers\**" />
-		<EmbeddedResource Remove="DTOs\**" />
-		<EmbeddedResource Remove="Extensions\**" />
-		<EmbeddedResource Remove="Middleware\**" />
-		<EmbeddedResource Remove="Services\**" />
-		<EmbeddedResource Remove="SignalR\**" />
-		<EmbeddedResource Remove="wwwroot\**" />
 		<None Remove="%2a%2a\**" />
-		<None Remove="Controllers\**" />
-		<None Remove="DTOs\**" />
-		<None Remove="Extensions\**" />
-		<None Remove="Middleware\**" />
-		<None Remove="Services\**" />
-		<None Remove="SignalR\**" />
-		<None Remove="wwwroot\**" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -60,6 +32,48 @@
 
 	<ItemGroup>
 		<None Remove="%2a%2a/%2a" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Include="Controllers\AccountController.cs" />
+	  <Compile Include="Controllers\ActivitiesController.cs" />
+	  <Compile Include="Controllers\BaseApiController.cs" />
+	  <Compile Include="Controllers\BuggyController.cs" />
+	  <Compile Include="Controllers\FallbackController.cs" />
+	  <Compile Include="Controllers\FollowController.cs" />
+	  <Compile Include="Controllers\PhotosController.cs" />
+	  <Compile Include="Controllers\ProfilesController.cs" />
+	  <Compile Include="Controllers\WeatherForecastController.cs" />
+	  <Compile Include="DTOs\LoginDto.cs" />
+	  <Compile Include="DTOs\RegisterDto.cs" />
+	  <Compile Include="DTOs\UserDto.cs" />
+	  <Compile Include="Extensions\ApplicationServiceExtension.cs" />
+	  <Compile Include="Extensions\HttpExtensions.cs" />
+	  <Compile Include="Extensions\IdentityServiceExtension.cs" />
+	  <Compile Include="Middleware\ExceptionMiddleware.cs" />
+	  <Compile Include="Program.cs" />
+	  <Compile Include="Services\TokenService.cs" />
+	  <Compile Include="SignalR\ChatHub.cs" />
+	  <Compile Include="WeatherForecast.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="appsettings.Development.json" />
+	  <Content Include="appsettings.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Include="wwwroot\static\css\main.93f08248.css.map" />
+	  <None Include="wwwroot\static\js\787.627756db.chunk.js" />
+	  <None Include="wwwroot\static\js\787.627756db.chunk.js.map" />
+	  <None Include="wwwroot\static\js\main.057cb357.js" />
+	  <None Include="wwwroot\static\js\main.057cb357.js.map" />
+	  <None Include="wwwroot\static\media\brand-icons.278156e41e0ad908cf7f.woff2" />
+	  <None Include="wwwroot\static\media\brand-icons.6729d29753e000c17489.svg" />
+	  <None Include="wwwroot\static\media\icons.38c6d8bab26db77d8c80.woff2" />
+	  <None Include="wwwroot\static\media\icons.62d9dae4e0040e81c980.svg" />
+	  <None Include="wwwroot\static\media\outline-icons.687a4990ea22bb1a49d4.woff2" />
+	  <None Include="wwwroot\static\media\outline-icons.9c4845b4b41ef40a22fa.svg" />
 	</ItemGroup>
 
 	<ItemGroup>
