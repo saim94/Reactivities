@@ -32,10 +32,32 @@ var app = builder.Build(); //Build the APP
 //Add Any middleware in this section
 app.UseMiddleware<ExceptionMiddleware>();
 
+app.UseXContentTypeOptions();
+app.UseReferrerPolicy(opt => opt.NoReferrer());
+app.UseXXssProtection(opt => opt.EnabledWithBlockMode());
+app.UseXfo(opt => opt.Deny());
+app.UseCsp(opt => opt
+    .BlockAllMixedContent()
+    .StyleSources(s => s.Self().CustomSources("https://fonts.google.com/"))
+    .FontSources(s => s.Self().CustomSources("https://fonts.gstatic.com/", "data:"))
+    .FormActions(s => s.Self())
+    .FrameAncestors(s => s.Self())
+    .ImageSources(s => s.Self().CustomSources("blob:", "https://res.cloudinary.com/"))
+    .ScriptSources(s => s.Self())
+);
+
 if (app.Environment.IsDevelopment()) // Middleware for Swagger for Development Environment
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+else
+{
+    app.Use(async (context, next) =>
+    {
+        context.Response.Headers.Add("Strict-Transport-Security", "max-age=31536000");
+        await next.Invoke();
+    });
 }
 
 app.UseCors("CorsPolicy");
