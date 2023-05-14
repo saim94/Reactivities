@@ -7,7 +7,7 @@
 		<UserSecretsId>95f22407-fabf-41b9-baf7-370df413a81f</UserSecretsId>
 		<DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
 		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-		<EnableDefaultContentItems>false</EnableDefaultContentItems>
+		<!--<EnableDefaultContentItems>false</EnableDefaultContentItems>-->
 	</PropertyGroup>
 
 	<ItemGroup>
