@@ -6,6 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<UserSecretsId>95f22407-fabf-41b9-baf7-370df413a81f</UserSecretsId>
 		<DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
+		<EnableDefaultCompileItems>true</EnableDefaultCompileItems>
 	</PropertyGroup>
 
 	<ItemGroup>
