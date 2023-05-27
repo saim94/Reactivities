@@ -1,6 +1,7 @@
+import FacebookLogin from "@greatsumini/react-facebook-login";
 import { observer } from "mobx-react-lite";
 import { Link } from "react-router-dom";
-import { Button, Container, Header, Image, Segment } from "semantic-ui-react";
+import { Button, Container, Divider, Header, Image, Segment } from "semantic-ui-react";
 import { useStore } from "../../app/stores/Store";
 import LoginForm from "../users/LoginForm";
 import RegisterForm from "../users/RegisterForm";
@@ -29,10 +30,24 @@ export default observer(function HomePage() {
                         <Button onClick={() => modalStore.openModal(<RegisterForm />)} size='huge' inverted>
                             Register!
                         </Button>
+                        <Divider horizontal inverted>Or</Divider>
+                        <Button
+                            as={FacebookLogin}
+                            appId='536364895167291'
+                            size='huge'
+                            inverted
+                            color='facebook'
+                            content='Login with Facebook'
+                            loading={userStore.fbLoading}
+                            onSuccess={(response: any) => {
+                                console.log('Login success', response);
+                                userStore.facebookLogin(response.accessToken);
+                            }}
+                            onFail={(response: any) => {
+                                console.log('Login failed', response);
+                            }}
+                        />
                     </>
-                    //<Button as={Link} to='/login' size='huge' inverted>
-                    //    Login!
-                    //</Button>
 
                 )}
             </Container>

@@ -46,6 +46,7 @@
 	  <Compile Include="Controllers\PhotosController.cs" />
 	  <Compile Include="Controllers\ProfilesController.cs" />
 	  <Compile Include="Controllers\WeatherForecastController.cs" />
+	  <Compile Include="DTOs\FacebookDto.cs" />
 	  <Compile Include="DTOs\LoginDto.cs" />
 	  <Compile Include="DTOs\RegisterDto.cs" />
 	  <Compile Include="DTOs\UserDto.cs" />
