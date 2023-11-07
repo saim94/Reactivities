@@ -8,7 +8,8 @@ const cert = readFileSync('localhost.pem');
 export default defineConfig(() => {
     return {
         build: {
-            outDir: '../API/wwwroot'
+            outDir: '../API/wwwroot',
+            emptyOutDir: true
         },
         server: {
             port: 3000,
