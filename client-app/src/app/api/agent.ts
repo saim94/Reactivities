@@ -1,7 +1,9 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
 import { Activity, ActivityFormValues } from '../models/activity';
-import { PaginatedResult } from '../models/pagination';
+import { Conversation } from '../models/conversation';
+import { Message } from '../models/message';
+import { PaginatedResult, PagingParams } from '../models/pagination';
 import { Photo, Profile, UserActivity } from '../models/profile';
 import { User, UserFormValues } from '../models/user';
 import { router } from '../router/Routes';
@@ -13,7 +15,8 @@ const sleep = (delay: number) => {
     }))
 }
 
-axios.defaults.baseURL = process.env.REACT_APP_API_URL;
+//axios.defaults.baseURL = process.env.REACT_APP_API_URL;
+axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 //axios.defaults.headers.Authorization = `bearer ${localStorage.getItem('jwt')}`;
 
 
@@ -25,21 +28,21 @@ axios.interceptors.request.use(config => {
 })
 
 axios.interceptors.response.use(async response => {
-    if (process.env.NODE_ENV === 'development') await sleep(1000);
+    if (import.meta.env.DEV) await sleep(1000);
     const pagination = response.headers['pagination'];
     if (pagination) {
         response.data = new PaginatedResult(response.data, JSON.parse(pagination));
-        return response as AxiosResponse<PaginatedResult<any>>;
+        return response as AxiosResponse<PaginatedResult<unknown>>;
     }
     return response;
 
 }, (error: AxiosError) => {
+    
     const { data, status, config, headers } = error.response as AxiosResponse;
     switch (status) {
         case 400:
-            debugger;
             //toast.error('bad request');
-            if (config.method === 'get' && data.errors && data.errors.hasOwnProperty('id')) {
+            if (config.method === 'get' && data.errors && Object.prototype.hasOwnProperty.call(data.errors, 'id')) {
                 router.navigate('/not-found')
             }
             if (data.errors) {
@@ -54,12 +57,14 @@ axios.interceptors.response.use(async response => {
                 toast.error(data);
             }
             break;
-        case 401:
-            if (status === 401 && headers['WWW-Authenticate']?.startsWith('Bearer error="invalid_token"')) {
+        case 401: {
+            const wwwAuthenticateHeader = headers?.['www-authenticate'] || headers?.['WWW-Authenticate'] || '';
+            if (status === 401 && wwwAuthenticateHeader.toLowerCase().startsWith('bearer error="invalid_token"')) {
                 toast.error('Session expired - please login again');
                 store.userStore.logout();
             }
             break;
+        }
         case 403:
             toast.error('forbidden');
             break;
@@ -89,8 +94,8 @@ const responseBody = <T>(response: AxiosResponse<T>) => response.data;
 
 const requests = {
     get: <T>(url: string) => axios.get<T>(url).then(responseBody),
-    post: <T>(url: string, body: {}) => axios.post<T>(url, body).then(responseBody),
-    put: <T>(url: string, body: {}) => axios.put<T>(url, body).then(responseBody),
+    post: <T>(url: string, body: object) => axios.post<T>(url, body).then(responseBody),
+    put: <T>(url: string, body: object) => axios.put<T>(url, body).then(responseBody),
     del: <T>(url: string) => axios.delete<T>(url).then(responseBody),
 }
 
@@ -112,10 +117,16 @@ const Account = {
     refreshToken: () => requests.post<User>("/account/refreshToken", {})
 }
 
+const Conversations = {
+    get: (userName: string) => requests.get<PaginatedResult<Conversation>>(`/conversations/${userName}`),
+    delete: (conversationId: number) => requests.del<void>(`/conversations/${conversationId}`),
+    getMessages: (conversationId: number, params: PagingParams) => axios.get<PaginatedResult<Message[]>>(`/messages/${conversationId}`, { params })
+}
+
 const Profiles = {
     get: (username: string) => requests.get<Profile>(`/profiles/${username}`),
     uploadPhoto: (file: Blob) => {
-        let formData = new FormData();
+        const formData = new FormData();
         formData.append('file', file);
         return axios.post<Photo>('photos', formData, {
             headers: { 'Content-Type': 'multipart/form-data' }
@@ -135,7 +146,8 @@ const Profiles = {
 const agent = {
     Activities,
     Account,
-    Profiles
+    Profiles,
+    Conversations
 }
 
 export default agent;

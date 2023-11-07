@@ -16,8 +16,92 @@ body {
     width: 100%;
 }
 
-/*home page styles*/
+.right-aligned-comment {
+    text-align: right;
+}
 
+.chatbox-container {
+    position: relative;
+    height: 300px; /* Adjust the height as per your requirements */
+    overflow-y: auto;
+    max-width: inherit !important;
+}
+
+.back-to-bottom-button {
+    position: absolute;
+    bottom: 0;
+    /* ... other styles ... */
+}
+
+.back-to-bottom-container {
+    /*min-height: 36px;*/
+    position: sticky;
+    bottom: 0;
+    display: none;
+    justify-content: center;
+    /*padding: 10px 0;*/
+    /*background-color: white;*/ /* Adjust as needed */
+    z-index: 1;
+    /*height: 0;
+    transition: height 0.3s ease-in-out;
+    overflow: hidden;*/
+}
+
+    .back-to-bottom-container.visible {
+        display: flex;
+        /*height: 36px;*/ /* Adjust this value as needed */
+    }
+
+    .back-to-bottom-container.hidden {
+        /*height: 0;
+        overflow: hidden;*/
+        display: none;
+    }
+
+    .back-to-bottom-container.count {
+        bottom: 35px;
+    }
+
+    .badgeStyle {
+        display: inline-block;
+        background-color: red;
+        color: white;
+        border-radius: 50%;
+        padding: 6px;
+        font-size: 12px;
+        font-weight: bold;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        margin-left: 4px;
+    }
+
+.sent-message {
+    justify-content: flex-end !important;
+}
+
+.received-message {
+    justify-content: flex-start !important;
+}
+
+
+.messagesSegment {
+    margin: 0px !important;
+}
+
+.messageRow {
+    padding: 3px 0px 0px 0px !important;
+}
+
+.messageColumn {
+    width: 50% !important;
+}
+
+.messageGroupHeader {
+    margin-bottom: 10px !important;
+}
+/*.comment-group-width {
+    width: 100% !important;
+}*/
+/*home page styles*/
 .masthead {
     display: flex;
     align-items: center;
@@ -40,4 +124,12 @@ body {
         font-weight: normal;
     }
 
+.ui.active.button {
+    background-color: #207BA5
+}
+
+
 /*end home page styles*/
+.no-caret > .dropdown.icon:before {
+    display: none !important;
+}

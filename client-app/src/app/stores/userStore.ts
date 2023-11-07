@@ -7,8 +7,9 @@ import { store } from "./Store";
 export default class UserStore {
     user: User | null = null;
     fbLoading = false;
-    refreshTokenTimeout: any;
-
+    //appLoading = false;
+    //refreshTokenTimeout: any;
+    refreshTokenTimeout: NodeJS.Timeout | null = null;
 
     constructor() {
         makeAutoObservable(this);
@@ -18,9 +19,12 @@ export default class UserStore {
         return !!this.user;
     }
 
+    //setAppLoading = (value: boolean) => {
+    //    this.appLoading = value;
+    //}
+
     login = async (creds: UserFormValues) => {
         try {
-            debugger;
             const user = await agent.Account.login(creds);
             store.commonStore.setToken(user.token);
             this.startRefreshTokenTimer(user);
@@ -29,6 +33,7 @@ export default class UserStore {
             router.navigate('/activities');
             store.modalStore.closeModal();
         } catch (error) {
+            console.log(error);
             throw error;
         }
     }
@@ -42,23 +47,42 @@ export default class UserStore {
             router.navigate('/activities');
             store.modalStore.closeModal();
         } catch (error) {
+            console.log(error);
             throw error;
         }
     }
 
     logout = () => {
         store.commonStore.setToken(null);
+        store.activityStore.resetStore();
+        store.commentStore.resetStore();
+        store.conversationStore.resetStore();
+        store.profileStore.resetStore();
         this.user = null;
         router.navigate('/')
     }
 
     getUser = async () => {
-        //debugger
         try {
             const user = await agent.Account.current();
             store.commonStore.setToken(user.token);
             runInAction(() => this.user = user);
             this.startRefreshTokenTimer(user);
+
+            let lastVisitedlocString = localStorage.getItem('lastVisitedlocation');
+            lastVisitedlocString = (lastVisitedlocString && !lastVisitedlocString.includes('object')) ? lastVisitedlocString : '';
+            if (lastVisitedlocString !== '') {
+                //const locationObject: LocationObj = JSON.parse(lastVisitedlocString);
+
+                const wasPageRefreshed = localStorage.getItem('pageRefreshed');
+
+                if (!!wasPageRefreshed && lastVisitedlocString) {
+                    router.navigate(lastVisitedlocString);
+                    //this.setAppLoading(true);
+                    //this.appLoading = true;
+                }
+            }
+
         } catch (error) {
             console.log(error);
         }
@@ -106,6 +130,13 @@ export default class UserStore {
         }
     }
 
+    //private startRefreshTokenTimer(user: User) {
+    //    const jwtToken = JSON.parse(atob(user.token.split('.')[1]));
+    //    const expires = new Date(jwtToken.exp * 1000);
+    //    const timeout = expires.getTime() - Date.now() - (60 * 1000);
+    //    this.refreshTokenTimeout = setTimeout(this.refreshToken, timeout);
+    //}
+
     private startRefreshTokenTimer(user: User) {
         const jwtToken = JSON.parse(atob(user.token.split('.')[1]));
         const expires = new Date(jwtToken.exp * 1000);
@@ -114,6 +145,11 @@ export default class UserStore {
     }
 
     private stopRefreshTokenTimer() {
-        clearTimeout(this.refreshTokenTimeout);
+        if (this.refreshTokenTimeout !== null) {
+            clearTimeout(this.refreshTokenTimeout);
+            this.refreshTokenTimeout = null; // Reset the timeout property after clearing it.
+        }
     }
+
+
 }

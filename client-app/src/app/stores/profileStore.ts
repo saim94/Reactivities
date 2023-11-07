@@ -11,7 +11,7 @@ export default class ProfileStore {
     loading = false;
     followings: Profile[] = [];
     loadingFollowings = false;
-    activeTab = 0;
+    activeTab: number | string | undefined = 0;
     userActivities: UserActivity[] = [];
     loadingActivities = false;
 
@@ -31,7 +31,7 @@ export default class ProfileStore {
         )
     }
 
-    setActiveTab = (activeTab: any) => {
+    setActiveTab = (activeTab: number | string | undefined) => {
         this.activeTab = activeTab;
     }
 
@@ -45,7 +45,7 @@ export default class ProfileStore {
     loadProfile = async (username: string) => {
         this.loadingProfile = true;
         try {
-            var profile = await agent.Profiles.get(username);
+            const profile = await agent.Profiles.get(username);
             runInAction(() => {
                 this.profile = profile;
                 this.loadingProfile = false;
@@ -186,5 +186,18 @@ export default class ProfileStore {
                 this.loadingActivities = false;
             })
         }
+    }
+
+    resetStore = () => {
+        this.currentUserProfile = null;
+        this.profile = null;
+        this.loadingProfile = false;
+        this.uploading = false;
+        this.loading = false;
+        this.followings = [];
+        this.loadingFollowings = false;
+        this.activeTab = 0;
+        this.userActivities = [];
+        this.loadingActivities = false;
     }
 }

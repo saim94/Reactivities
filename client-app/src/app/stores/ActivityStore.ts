@@ -39,7 +39,7 @@ export default class ActivityStore {
 
     setPredicate = (predicate: string, value: string | Date) => {
         const resetPredicate = () => {
-            this.predicate.forEach((value, key) => {
+            this.predicate.forEach((_, key) => {
                 if (key !== 'startDate') this.predicate.delete(key);
             });
         }
@@ -121,7 +121,6 @@ export default class ActivityStore {
         else {
             this.setLoadingInitial(true);
             try {
-                debugger;
                 activity = await agent.Activities.details(id);
                 this.setActivity(activity);
                 runInAction(() => {
@@ -141,7 +140,6 @@ export default class ActivityStore {
     }
 
     private setActivity = (activity: Activity) => {
-        debugger;
         const user = store.userStore.user;
         if (user) {
             activity.isGoing = activity.attendees!.some(
@@ -201,7 +199,7 @@ export default class ActivityStore {
             await agent.Activities.update(activity);
             runInAction(() => {
                 if (activity.id) {
-                    let updatedActivity = { ...this.getActivity(activity.id), ...activity };
+                    const updatedActivity = { ...this.getActivity(activity.id), ...activity };
                     this.activityRegistry.set(activity.id, updatedActivity as Activity);
                     this.selectedActivity = updatedActivity as Activity;
                 }
@@ -272,7 +270,6 @@ export default class ActivityStore {
     }
 
     updateAttendeeFollowing = (username: string) => {
-        debugger;
         this.activityRegistry.forEach(activity => {
             activity.attendees.forEach(attendee => {
                 if (attendee.username === username) {
@@ -283,4 +280,8 @@ export default class ActivityStore {
         })
     }
 
+    resetStore = () => {
+        this.activityRegistry.clear();
+        this.selectedActivity = undefined;
+    }
 }

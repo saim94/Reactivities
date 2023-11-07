@@ -1,6 +1,6 @@
 import { Formik, Form, Field, FieldProps } from 'formik';
 import { observer } from 'mobx-react-lite'
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom';
 import { Segment, Header, Comment, Loader } from 'semantic-ui-react'
 import { store, useStore } from '../../../app/stores/Store';
@@ -17,14 +17,12 @@ export default observer(function ActivityDetailedChat({ activityId }: Props) {
 
     useEffect(() => {
         if (activityId) {
-            debugger;
             commentStore.createHubConnection(activityId);
         }
         return () => {
             commentStore.clearComments();
         }
     }, [commentStore, activityId]);
-    debugger;
     return (
         <>
             <Segment

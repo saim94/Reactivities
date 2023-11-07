@@ -5,6 +5,7 @@ export default class CommonStore {
     error: ServerError | null = null;
     token: string | null = localStorage.getItem('jwt');
     appLoaded = false;
+    //groups: SignalRGroup[] = [];
 
     constructor() {
         makeAutoObservable(this);
@@ -32,4 +33,27 @@ export default class CommonStore {
     setAppLoaded = () => {
         this.appLoaded = true;
     }
+
+    //manageGroups = (connectionId: string, conversationId: number) => {
+    //    debugger;
+    //    var group = this.groups.find(x => x.conversationId === conversationId);
+
+    //    if (group) {
+    //        if (group.connectionId === connectionId)
+    //            return;
+    //        else
+    //            group.connectionId = connectionId;
+    //    }
+    //    else this.groups.push(new SignalRGroup(connectionId, conversationId));
+    //}
+
+    //getGroupConnectionId = (conversationId: number) => {
+    //    debugger;
+    //    var group = this.groups.find(x => x.conversationId === conversationId);
+    //    if (group !== undefined) {
+    //        return group.connectionId;
+    //    } else {
+    //        return "";
+    //    }
+    //}
 }

@@ -44,7 +44,7 @@ app.UseCsp(opt => opt
     .FormActions(s => s.Self())
     .FrameAncestors(s => s.Self())
     .ImageSources(s => s.Self()
-        .CustomSources("blob:", "data:", "https://res.cloudinary.com/", "https://platform-lookaside.fbsbx.com"))
+        .CustomSources("blob:", "data:", "https://res.cloudinary.com/", "https://platform-lookaside.fbsbx.com", "https://graph.facebook.com"))
     .ScriptSources(s => s.Self().CustomSources("https://connect.facebook.net"))
 );
 
@@ -75,6 +75,8 @@ app.UseStaticFiles();
 app.MapControllers(); // Middleware for Map our Controllers
 
 app.MapHub<ChatHub>("/chat");
+
+app.MapHub<MessageHub>("/message");
 
 app.MapFallbackToController("Index", "Fallback");
 

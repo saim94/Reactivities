@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -16,11 +17,12 @@ namespace Persistence
         }
 
         public DbSet<Activity> Activities { get; set; }
-
         public DbSet<ActivityAttendee> ActivityAttendees { get; set; }
         public DbSet<Photo> Photos { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<UserFollowing> UserFollowings { get; set; }
+        public DbSet<Message> Messages { get; set; }
+        public DbSet<Conversation> Conversations { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -56,6 +58,24 @@ namespace Persistence
                 .HasForeignKey(o => o.TargetId)
                 .OnDelete(DeleteBehavior.Cascade);
             });
+
+            //builder.Entity<Conversation>()
+            //    .HasKey(k => new { k.User1_Id, k.User2_Id });
+
+            builder.Entity<Conversation>()
+                .HasOne(c => c.User1)
+                .WithMany(u => u.Conversations)
+                .HasForeignKey(c => c.User1_Id);
+
+            builder.Entity<Conversation>()
+                .HasOne(c => c.User2)
+                .WithMany()
+                .HasForeignKey(c => c.User2_Id);
+
+            builder.Entity<Message>()
+            .HasOne(m => m.Conversation)
+            .WithMany(c => c.Messages)
+            .HasForeignKey(m => m.ConversationId);
         }
     }
 }

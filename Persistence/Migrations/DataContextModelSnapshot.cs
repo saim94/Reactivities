@@ -17,7 +17,7 @@ namespace Persistence.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.3")
+                .HasAnnotation("ProductVersion", "7.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -169,6 +169,73 @@ namespace Persistence.Migrations
                     b.HasIndex("AuthorId");
 
                     b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("Domain.Conversation", b =>
+                {
+                    b.Property<int>("ConversationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("ConversationId"));
+
+                    b.Property<bool>("User1Deleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("User1_Id")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("User2Deleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("User2_Id")
+                        .HasColumnType("text");
+
+                    b.HasKey("ConversationId");
+
+                    b.HasIndex("User1_Id");
+
+                    b.HasIndex("User2_Id");
+
+                    b.ToTable("Conversations");
+                });
+
+            modelBuilder.Entity("Domain.Message", b =>
+                {
+                    b.Property<int>("MessageId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("MessageId"));
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsRead")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("SenderId")
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("SentAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<bool>("User1Deleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("User2Deleted")
+                        .HasColumnType("boolean");
+
+                    b.HasKey("MessageId");
+
+                    b.HasIndex("ConversationId");
+
+                    b.HasIndex("SenderId");
+
+                    b.ToTable("Messages");
                 });
 
             modelBuilder.Entity("Domain.Photo", b =>
@@ -401,6 +468,38 @@ namespace Persistence.Migrations
                     b.Navigation("Author");
                 });
 
+            modelBuilder.Entity("Domain.Conversation", b =>
+                {
+                    b.HasOne("Domain.AppUser", "User1")
+                        .WithMany("Conversations")
+                        .HasForeignKey("User1_Id");
+
+                    b.HasOne("Domain.AppUser", "User2")
+                        .WithMany()
+                        .HasForeignKey("User2_Id");
+
+                    b.Navigation("User1");
+
+                    b.Navigation("User2");
+                });
+
+            modelBuilder.Entity("Domain.Message", b =>
+                {
+                    b.HasOne("Domain.Conversation", "Conversation")
+                        .WithMany("Messages")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.AppUser", "Sender")
+                        .WithMany()
+                        .HasForeignKey("SenderId");
+
+                    b.Navigation("Conversation");
+
+                    b.Navigation("Sender");
+                });
+
             modelBuilder.Entity("Domain.Photo", b =>
                 {
                     b.HasOne("Domain.AppUser", null)
@@ -498,6 +597,8 @@ namespace Persistence.Migrations
                 {
                     b.Navigation("Activities");
 
+                    b.Navigation("Conversations");
+
                     b.Navigation("Followers");
 
                     b.Navigation("Followings");
@@ -505,6 +606,11 @@ namespace Persistence.Migrations
                     b.Navigation("Photos");
 
                     b.Navigation("RefreshTokens");
+                });
+
+            modelBuilder.Entity("Domain.Conversation", b =>
+                {
+                    b.Navigation("Messages");
                 });
 #pragma warning restore 612, 618
         }

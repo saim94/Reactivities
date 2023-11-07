@@ -7,7 +7,7 @@
 		<UserSecretsId>95f22407-fabf-41b9-baf7-370df413a81f</UserSecretsId>
 		<DockerDefaultTargetOS>Windows</DockerDefaultTargetOS>
 		<EnableDefaultCompileItems>false</EnableDefaultCompileItems>
-		<!--<EnableDefaultContentItems>false</EnableDefaultContentItems>-->
+		<EnableDefaultContentItems>false</EnableDefaultContentItems>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -41,13 +41,16 @@
 	  <Compile Include="Controllers\ActivitiesController.cs" />
 	  <Compile Include="Controllers\BaseApiController.cs" />
 	  <Compile Include="Controllers\BuggyController.cs" />
+	  <Compile Include="Controllers\ConversationsController.cs" />
 	  <Compile Include="Controllers\FallbackController.cs" />
 	  <Compile Include="Controllers\FollowController.cs" />
+	  <Compile Include="Controllers\MessagesController.cs" />
 	  <Compile Include="Controllers\PhotosController.cs" />
 	  <Compile Include="Controllers\ProfilesController.cs" />
 	  <Compile Include="Controllers\WeatherForecastController.cs" />
 	  <Compile Include="DTOs\FacebookDto.cs" />
 	  <Compile Include="DTOs\LoginDto.cs" />
+	  <Compile Include="DTOs\MessageDto.cs" />
 	  <Compile Include="DTOs\RegisterDto.cs" />
 	  <Compile Include="DTOs\UserDto.cs" />
 	  <Compile Include="Extensions\ApplicationServiceExtension.cs" />
@@ -57,6 +60,8 @@
 	  <Compile Include="Program.cs" />
 	  <Compile Include="Services\TokenService.cs" />
 	  <Compile Include="SignalR\ChatHub.cs" />
+	  <Compile Include="SignalR\MessageHub.cs" />
+	  <Compile Include="SignalR\UserDetailProvider.cs" />
 	  <Compile Include="WeatherForecast.cs" />
 	</ItemGroup>
 
@@ -79,16 +84,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.3" />
-		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.1" />
-		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.1">
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.5" />
+		<PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.5" />
+		<PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="7.0.5">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.1" />
 		<PackageReference Include="NWebsec.AspNetCore.Middleware" Version="3.0.0" />
-		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.27.0" />
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.30.1" />
 	</ItemGroup>
 
 	<ItemGroup>

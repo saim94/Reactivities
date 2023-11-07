@@ -1,4 +1,5 @@
-﻿using Application.Activities;
+﻿using API.SignalR;
+using Application.Activities;
 using Application.Core;
 using Application.Interfaces;
 using Domain;
@@ -7,8 +8,10 @@ using FluentValidation.AspNetCore;
 using Infrastructure.Photos;
 using Infrastructure.Security;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
+using System.Reflection;
 
 namespace API.Extensions
 {
@@ -72,8 +75,8 @@ namespace API.Extensions
                             );
                         });
 
-            services.AddMediatR(typeof(List.Handler)); // needs to tell it where handler is located ie class/path. 
-                                                       //typeof(List.Handler) Tells this is type of handler or this is the location of handler.
+            services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<List.Query>()); // needs to tell it where handler is located ie class/path. 
+                                                                                                           //typeof(List.Handler) Tells this is type of handler or this is the location of handler.
             services.AddAutoMapper(typeof(MappingProfiles).Assembly);
             services.AddFluentValidationAutoValidation();
             services.AddValidatorsFromAssemblyContaining<Create>();
@@ -84,8 +87,10 @@ namespace API.Extensions
             services.AddSignalR(o =>
             {
                 o.EnableDetailedErrors = true;
+                o.KeepAliveInterval = TimeSpan.FromMinutes(1);
+                o.ClientTimeoutInterval = TimeSpan.FromMinutes(1.5);
             });
-
+            services.AddSingleton<IUserIdProvider, UserDetailProvider>();
             return services;
         }
     }

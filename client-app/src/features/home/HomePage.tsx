@@ -1,4 +1,4 @@
-import FacebookLogin from "@greatsumini/react-facebook-login";
+import FacebookLogin, { FailResponse, SuccessResponse } from "@greatsumini/react-facebook-login";
 import { observer } from "mobx-react-lite";
 import { Link } from "react-router-dom";
 import { Button, Container, Divider, Header, Image, Segment } from "semantic-ui-react";
@@ -31,19 +31,14 @@ export default observer(function HomePage() {
                             Register!
                         </Button>
                         <Divider horizontal inverted>Or</Divider>
-                        <Button
-                            as={FacebookLogin}
+                        <FacebookLogin
+                            className='ui facebook huge inverted button'
                             appId='536364895167291'
-                            size='huge'
-                            inverted
-                            color='facebook'
-                            content='Login with Facebook'
-                            loading={userStore.fbLoading}
-                            onSuccess={(response: any) => {
+                            onSuccess={(response: SuccessResponse) => {
                                 console.log('Login success', response);
                                 userStore.facebookLogin(response.accessToken);
                             }}
-                            onFail={(response: any) => {
+                            onFail={(response: FailResponse) => {
                                 console.log('Login failed', response);
                             }}
                         />

@@ -1,4 +1,5 @@
-﻿using Application.Core;
+﻿using Application.Conversations;
+using Application.Core;
 using Application.Interfaces;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;

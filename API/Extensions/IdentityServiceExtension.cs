@@ -1,8 +1,10 @@
 ﻿using API.Services;
+using API.SignalR;
 using Domain;
 using Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.IdentityModel.Tokens;
 using Persistence;
 using System.Text;
@@ -35,13 +37,15 @@ namespace API.Extensions
                         ClockSkew = TimeSpan.Zero
                     };
 
+                    opt.IncludeErrorDetails = true;
+
                     opt.Events = new JwtBearerEvents
                     {
                         OnMessageReceived = context =>
                         {
                             var accessToken = context.Request.Query["access_token"];
                             var path = context.HttpContext.Request.Path;
-                            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chat"))
+                            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chat") || path.StartsWithSegments("/message"))
                             {
                                 context.Token = accessToken;
                             }
