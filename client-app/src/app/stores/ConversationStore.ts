@@ -88,7 +88,7 @@ export default class ConversationStore {
         this.hubConnection.on('UpdateMessageStatus', this.UpdateMessageStatus);
 
         this.hubConnection.onclose(() => {
-            console.log('OnCloseCalled');
+            //console.log('OnCloseCalled');
             if (this.shouldReconnect) {
                 this.createHubConnection();
             }
@@ -212,7 +212,7 @@ export default class ConversationStore {
 
     updateIsRead = async (messageId: number) => {
         //if (!this.fetchMessages) {
-        console.log('called');
+        //console.log('called');
         if (this.newMessage) {
             const message = this.selectedConversation?.messages.find(x => x.messageId === messageId);
             message!.isRead = true;
@@ -231,7 +231,7 @@ export default class ConversationStore {
             conversationId: this.selectedConversation?.conversationId.toString(),
             senderName: this.selectedConversation?.messages.find(x => x.messageId === messageId)?.sender.userName,
         };
-        console.log(data);
+        //console.log(data);
         this.hubConnection!.invoke('UpdateIsRead', data)
             .then(() => console.log('message status updated'))
             .catch((error: Error) => {

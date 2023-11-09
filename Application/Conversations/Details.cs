@@ -66,6 +66,8 @@ namespace Application.Conversations
                 }
                 else conversation = new Conversation();
 
+                conversation = new Conversation();
+
                 var conversationDto = _mapper.Map<Conversation, ConversationDto>(conversation);
 
                 //return Result<PagedList<MessageDto>>.Success(

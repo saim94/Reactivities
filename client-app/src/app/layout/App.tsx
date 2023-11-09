@@ -29,7 +29,7 @@ function App() {
         localStorage.setItem('lastVisitedlocation', location.pathname);
         // Add a listener to capture browser refresh or tab close
         window.addEventListener('beforeunload', () => {
-            console.log('refreshed');
+            //console.log('refreshed');
             localStorage.setItem('pageRefreshed', 'true');
         });
 
@@ -39,7 +39,7 @@ function App() {
                 localStorage.setItem('pageRefreshed', 'true');
             });
         };
-    }, [navigate, location.pathname]);
+    }, [navigate]);
 
     useEffect(() => {
         //debugger
@@ -59,14 +59,14 @@ function App() {
         //}
 
         /*localStorage.setItem('lastVisitedUrl', location.pathname);*/
-        console.log(location);
+        //console.log(location);
         if (location.pathname.includes('chat/')) {
-            console.log('INBOX OPENED')
+            //console.log('INBOX OPENED')
             setOpenInbox(true);
         }
         else {
             if (inboxOpen) {
-                console.log('INBOX CLOSED')
+                //console.log('INBOX CLOSED')
                 setOpenInbox(false);
             }
         }

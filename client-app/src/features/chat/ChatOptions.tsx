@@ -17,7 +17,6 @@ export default observer(function DropDown({ conversationId, messagesCount }: Pro
     const { conversationStore } = useStore();
 
     const handleDelete = () => {
-        console.log('Delete Request');
         setConfirmOpen(true);
     };
 

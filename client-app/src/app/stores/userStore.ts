@@ -29,7 +29,6 @@ export default class UserStore {
             store.commonStore.setToken(user.token);
             this.startRefreshTokenTimer(user);
             runInAction(() => this.user = user);
-            console.log(this.user);
             router.navigate('/activities');
             store.modalStore.closeModal();
         } catch (error) {

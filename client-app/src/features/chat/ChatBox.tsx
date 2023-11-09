@@ -35,10 +35,11 @@ export default observer(function Chatbox() {
     const [showBottomButton, setShowBottomButton] = useState(false);
 
     useEffect(() => {
+
         if (username !== undefined && profile === null) {
             loadProfile(username);
         }
-        if ((!selectedConversation || selectedConversation.messages.length === 0) && username) {
+        if ((!selectedConversation || selectedConversation.messages.length === 0 && selectedConversation.conversationId !== 0) && username) {
             GetConversation(username);
         }
     }, [username, GetConversation, loadProfile, profile, selectedConversation])
@@ -87,11 +88,11 @@ export default observer(function Chatbox() {
         if (event.currentTarget.scrollTop === 0) {
             //setLoadingNext(true); //Temp
             setScrollBottom(false); //to trigger scroll bottom for load messages request
-            console.log('Loading messsages');
-            console.log(event.currentTarget.scrollHeight);
-            if (messagesContainerRef && messagesContainerRef.current) {
-                console.log(messagesContainerRef.current.scrollHeight);
-            }
+            //console.log('Loading messsages');
+            //console.log(event.currentTarget.scrollHeight);
+            //if (messagesContainerRef && messagesContainerRef.current) {
+            //    console.log(messagesContainerRef.current.scrollHeight);
+            //}
         }
         //if (event.currentTarget.scrollTop < (event.currentTarget.scrollHeight - 20)) {
         //    debugger
@@ -286,7 +287,7 @@ export default observer(function Chatbox() {
                 <Formik
                     initialValues={new MessageData("", username!, "")}
                     onSubmit={(values, { resetForm }) => {
-                        console.log(values)
+                        //console.log(values)
                         resetForm();
                         send(values);
                         //handleRemoveDiv();

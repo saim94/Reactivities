@@ -18,7 +18,6 @@ export default observer(function MessageComponent({ message }: Props) {
     const content = user?.userName === message.sender.userName ? 'Unsend' : 'Delete';
     const handleDelete = () => {
         setMethod(content);
-        console.log('Delete Request');
         setConfirmOpen(true);
     };
 
