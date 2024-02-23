@@ -1,10 +1,42 @@
 import { makeAutoObservable, reaction } from "mobx";
+import agent from "../api/agent";
+import { Profile } from "../models/profile";
 import { ServerError } from "../models/ServerError";
 
 export default class CommonStore {
+
     error: ServerError | null = null;
     token: string | null = localStorage.getItem('jwt');
     appLoaded = false;
+    scrollBottom = true;
+    syncPages = false;
+    messageCount = 0;
+    firstUnreadMessageId = 0
+    matchedUsers: Profile[] = [];
+    unReadMessageCount = 0;
+    showLabel = true;
+
+    setShowLabel = (value: boolean) => {
+        this.showLabel = value;
+    }
+    setFirstUnreadMessageId = (value: number) => {
+        this.firstUnreadMessageId = value;
+    }
+    setUnReadMessageCount = (value: number) => {
+        this.unReadMessageCount = value;
+    }
+    setMessageCount = (value: number) => {
+        this.messageCount = value;
+    }
+    setSyncPages = (value: boolean) => {
+        this.syncPages = value;
+    }
+    setScrollBottom = (value: boolean) => {
+        this.scrollBottom = value;
+    }
+    setMatchedUsers = (value: Profile[]) => {
+        this.matchedUsers = value;
+    }
     //groups: SignalRGroup[] = [];
 
     constructor() {
@@ -32,6 +64,11 @@ export default class CommonStore {
 
     setAppLoaded = () => {
         this.appLoaded = true;
+    }
+
+    getCount = async () => {
+        const count = await agent.Conversations.count();
+        this.setUnReadMessageCount(count);
     }
 
     //manageGroups = (connectionId: string, conversationId: number) => {

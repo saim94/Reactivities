@@ -2,8 +2,7 @@ import { createBrowserRouter, Navigate, RouteObject } from "react-router-dom";
 import ActivityDashboard from "../../features/activities/dashboard/ActivityDashboard";
 import ActivityDetails from "../../features/activities/details/ActivityDetails";
 import ActivityForm from "../../features/activities/form/ActivityForm";
-import ChatBox from "../../features/chat/ChatBox";
-import Inbox from "../../features/chat/Inbox";
+import Inbox2 from "../../features/chat/Inbox2";
 import NotFound from "../../features/errors/NotFound";
 import ServerError from "../../features/errors/ServerError";
 import TestErrors from "../../features/errors/TestError";
@@ -23,11 +22,13 @@ export const routes: RouteObject[] = [
                     { path: 'createActivity', element: <ActivityForm key='create' /> },
                     { path: 'manage/:id', element: <ActivityForm key='manage' /> },
                     { path: 'profiles/:username', element: <ProfilePage /> },
-                    { path: 'inbox', element: <Inbox /> },
-                    { path: 'chat/:username', element: <ChatBox /> },
+                    //{ path: 'inbox', element: <Inbox /> },
+                    { path: 'inbox/:id/Chat', element: <Inbox2 /> },
+                    { path: 'inbox/', element: <Inbox2 /> },
+                    /*{ path: 'chat', element: <ChatBox />, },*/
                     { path: 'errors', element: <TestErrors /> },
-                    { path: '/profiles/', element:<NotFound /> },
-                    { path: '/chat/', element: <NotFound /> },
+                    { path: '/profiles/', element: <NotFound /> },
+                    
                 ]
             },
 

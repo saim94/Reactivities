@@ -57,7 +57,7 @@ export default observer(function ActivityForm() {
     if (loadingInitial) return <LoadingComponent content="Loading activity..." />
 
     return (
-        <Segment clearing>
+        <Segment clearing style={{ marginTop: '5em' }}>
             <Header content='Activity Details' sub color='teal' />
             <Formik
                 enableReinitialize

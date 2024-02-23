@@ -1,5 +1,4 @@
-﻿using Application.Conversations;
-using Application.Core;
+﻿using Application.Core;
 using Application.Interfaces;
 using Application.ReturnDTOs;
 using AutoMapper;
@@ -43,35 +42,8 @@ namespace Application.Messages
             }
             public async Task<Result<PagedList<MessageDto>>> Handle(Query request, CancellationToken cancellationToken)
             {
-                //var userName = _userAccessor.GetUsername();
-                //var conversation = await _context.Conversations
-                //    .Include(x => x.User1).ThenInclude(p => p.Photos)
-                //    .Include(x => x.User2).ThenInclude(p => p.Photos)
-                //    .Include(x => x.Messages).
-                //    FirstOrDefaultAsync(x =>
-                //        (x.User1.UserName == userName && x.User2.UserName == request.UserName) ||
-                //        (x.User1.UserName == request.UserName && x.User2.UserName == userName)
-                //    );//Modify to optimize
                 var loggedInUserName = _userAccessor.GetUsername();
 
-                //var query = _context.Messages
-                //                .Where(x => x.ConversationId == request.ConversationId)
-                //                .Where(x => (!x.User1Deleted || !x.User2Deleted))
-                //                .OrderByDescending(x => x.MessageId) // Assuming you want to sort by MessageId, adjust as needed
-                //                .ProjectTo<MessageDto>(_mapper.ConfigurationProvider)
-                //                .AsQueryable();
-
-                //var query = _context.Messages
-                //    .Where(c => c.ConversationId == request.ConversationId)
-                //    .Where(x =>
-                //                (x.Sender.UserName == loggedInUserName && !x.User1Deleted)
-                //                                            ||
-                //                (x.Sender.UserName != loggedInUserName && !x.User2Deleted))
-                //    .OrderByDescending(x => x.MessageId) // Assuming you want to sort by MessageId, adjust as needed
-                //    .ProjectTo<MessageDto>(_mapper.ConfigurationProvider)
-                //    .AsQueryable();
-
-                /*Temporary*/
                 var query = _context.Messages
                     .Include(c => c.Conversation)
                         .ThenInclude(u => u.User1)
@@ -85,32 +57,6 @@ namespace Application.Messages
                     .OrderByDescending(x => x.MessageId) // Assuming you want to sort by MessageId, adjust as needed
                     .ProjectTo<MessageDto>(_mapper.ConfigurationProvider)
                     .AsQueryable();
-
-                //var messageDtos = new List<MessageDto>();
-                //var scorce = query.ToList();
-                //for (int i = 0; i < scorce.Count; i++)
-                //{
-                //    var x = scorce[i];
-                //    var s1 = string.Empty;
-                //    if (scorce.ElementAt(i).Content.Equals("176"))
-                //    {
-                //        var s = s1;
-                //    }
-
-                //    if ((x.Sender.UserName == loggedInUserName && !x.User1Deleted) || (x.Sender.UserName != loggedInUserName && !x.User2Deleted))
-                //    {
-                //        messageDtos.Add(x);
-                //    }
-                //}
-
-                /*Temporary*/
-                //var query = _context.Messages
-                //    .Where(x => x.ConversationId == request.ConversationId)
-                //    .Where(x => (!x.User1Deleted && x.Sender.UserName == loggedInUserName) ||
-                //                (!x.User2Deleted && x.Sender.UserName != loggedInUserName))
-                //    .OrderByDescending(x => x.MessageId) // Assuming you want to sort by MessageId, adjust as needed
-                //    .ProjectTo<MessageDto>(_mapper.ConfigurationProvider)
-                //    .AsQueryable();
 
                 return Result<PagedList<MessageDto>>.Success(
                     await PagedList<MessageDto>.CreateAsync(query, request.Params.PageNumber,

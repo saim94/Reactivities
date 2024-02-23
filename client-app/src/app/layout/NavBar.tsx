@@ -1,11 +1,11 @@
 import { observer } from "mobx-react-lite";
 import { Link, NavLink } from "react-router-dom";
-import { Button, Container, Dropdown, Image, Menu } from "semantic-ui-react"
+import { Button, Container, Dropdown, Icon, Image, Label, Menu } from "semantic-ui-react"
 import { useStore } from "../stores/Store";
 
 export default observer(function NavBar() {
 
-    const { userStore: { user, logout } } = useStore();
+    const { userStore: { user, logout }, commonStore: { unReadMessageCount, showLabel } } = useStore();
 
     return (
         <Menu inverted fixed="top">
@@ -21,7 +21,12 @@ export default observer(function NavBar() {
                 </Menu.Item>
                 <Menu.Item position='right'>
                     <Menu.Item position='right'>
-                        <Button as={NavLink} to="#" icon='envelope' />
+                        <Button as={NavLink} to="/inbox" basic size='mini'>
+                            <Icon name='envelope' />
+                            Inbox
+                            {showLabel && unReadMessageCount !== 0 && <Label color='red' floating circular>{unReadMessageCount}</Label>}
+                        </Button>
+
                     </Menu.Item>
                     <Image src={user?.image || '/assets/user.png'} avatar spaced='right' />
                     <Dropdown pointing='top left' text={user?.displayName}>

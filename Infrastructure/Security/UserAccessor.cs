@@ -21,5 +21,9 @@ namespace Infrastructure.Security
         {
             return _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.Name);
         }
+        public string GetUserid()
+        {
+            return _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        }
     }
 }

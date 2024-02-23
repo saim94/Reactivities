@@ -28,7 +28,7 @@ export default observer(function () {
     /*if (activityStore.loadingInitial && !loadingNext) return <LoadingComponent content="Loading activities" />*/
 
     return (
-        <Grid>
+        <Grid className='activityListGrid'>
             <Grid.Column width="10">
                 {activityStore.loadingInitial && !loadingNext ? (
                     <>

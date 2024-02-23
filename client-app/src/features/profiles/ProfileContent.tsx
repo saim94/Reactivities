@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { Button, Tab } from 'semantic-ui-react'
 import { Profile } from '../../app/models/profile'
 import { useStore } from '../../app/stores/Store'
+import UserChats from '../chat/UserChats'
 import ProfileAbout from './ProfileAbout'
 import ProfileActivities from './ProfileActivities'
 import ProfileFollowings from './ProfileFollowings'
@@ -14,7 +15,7 @@ interface Props {
 
 export default observer(function ProfileContent({ profile }: Props) {
 
-    const { profileStore, conversationStore: { setOpenInbox, getUnReadMessageCount } } = useStore();
+    const { profileStore, conversationStore: { setOpenInbox } } = useStore();
     const { userStore: { user } } = useStore();
     const panes = [
         { menuItem: 'About', render: () => <ProfileAbout /> },
@@ -22,19 +23,16 @@ export default observer(function ProfileContent({ profile }: Props) {
         { menuItem: 'Events', render: () => <ProfileActivities /> },
         { menuItem: 'Followers', render: () => <ProfileFollowings /> },
         { menuItem: 'Following', render: () => <ProfileFollowings /> },
-        /*{ menuItem: 'Chat', render: () => <div> <Statistic label='followers' value={profile.followersCount} /> <Inbox /> </div> }*/
         {
             menuItem: (
-                <Button as={Link} to={(profile?.username !== user?.userName) ? `/chat/${profile.username}` : '/inbox'} className="item" style={{ 'textAlign': 'left' }} key='chatTab' >
-                    Chat
-                    {getUnReadMessageCount > 0 && <div className='badgeStyle'>{getUnReadMessageCount}</div>}
+                <Button key='InboxChat' as={Link} to={profile.username !== user?.userName && `/inbox/${profile.id}/Chat`} style={{ 'textAlign': 'left', 'margin': '0px' }} className='item'>
+                    {(profile.username === user?.userName) ? 'Chats' : 'Chat'} {profile.unreadMessageCount > 0 && <div className='badgeStyle'>{profile.unreadMessageCount}</div>}
                 </Button>
-            ),
-            render: () => (profile?.username !== user?.userName) ? <Link to={`/chat/${profile.username}`} /> : <Link to={'/inbox'} />
+            ), render: () => (profile.username === user?.userName) ? <UserChats /> : /*<Inbox2 userName={profile.username} />*/ <Link to={`/inbox/${profile.id}/Chat`} />
         }
+
     ]
     return (
-
         <Tab
             key='profileTabs'
             menu={{ fluid: true, vertical: true }}

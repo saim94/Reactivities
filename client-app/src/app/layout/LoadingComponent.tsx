@@ -1,4 +1,4 @@
-import { Dimmer, Image, Loader } from 'semantic-ui-react';
+import { Dimmer, Image, Loader, Segment } from 'semantic-ui-react';
 
 interface Props {
     inverted?: boolean,
@@ -7,9 +7,11 @@ interface Props {
 
 export default function LoadingComponent({ inverted = true, content = "Loading..." }: Props) {
     return (
-        <Dimmer active={true} inverted={inverted}>
-            <Loader content={content} />
-            <Image src='/assets/logo.png' />
+        <Dimmer active={true} inverted={inverted} page>
+            <Segment raised secondary>
+                <Loader content={content} />
+                <Image bordered circular src='/assets/logo.png' />
+            </Segment>
         </Dimmer>
     )
 }

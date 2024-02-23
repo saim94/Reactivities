@@ -14,7 +14,10 @@ export default observer(function DropDown({ conversationId, messagesCount }: Pro
     const [confirmOpen, setConfirmOpen] = useState(false);
     const [isSendingRequest, setIsSendingRequest] = useState(false);
     const [deleteConfirmed, setDeleteConfirmed] = useState(false);
-    const { conversationStore } = useStore();
+    const {
+        conversationStore: { deleteConversation },
+        commonStore: { setScrollBottom }
+    } = useStore();
 
     const handleDelete = () => {
         setConfirmOpen(true);
@@ -23,10 +26,11 @@ export default observer(function DropDown({ conversationId, messagesCount }: Pro
     const handleConfirm = async () => {
         if (!isSendingRequest) {
             setIsSendingRequest(true); // Set loading state to true
-            await conversationStore.deleteConversation(conversationId);
+            deleteConversation(conversationId);
             setIsSendingRequest(false); // Set loading state back to false after request completes
             setConfirmOpen(false);
             setDeleteConfirmed(true);
+            setScrollBottom(false);
         }
 
     };

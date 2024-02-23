@@ -4,7 +4,7 @@
   "private": true,
   "dependencies": {
     "@greatsumini/react-facebook-login": "^3.3.3",
-    "@microsoft/signalr": "^7.0.5",
+    "@microsoft/signalr": "8.0.0",
     "@types/jest": "^29.5.2",
     "@types/node": "^20.2.5",
     "@types/react": "^18.2.8",
@@ -15,18 +15,22 @@
     "date-fns": "^2.30.0",
     "date-fns-tz": "^2.0.0",
     "formik": "^2.4.1",
+    "install": "^0.13.0",
     "latest": "^0.2.0",
     "mobx": "^6.9.0",
     "mobx-react-lite": "^4.0.5",
+    "npm": "^10.4.0",
     "react": "^18.2.0",
     "react-calendar": "^4.2.1",
     "react-cropper": "^2.3.3",
-    "react-datepicker": "^4.12.0",
+    "react-datepicker": "6.0.0",
     "react-dom": "^18.2.0",
     "react-dropzone": "^14.2.3",
     "react-infinite-scroller": "^1.2.6",
     "react-router-dom": "^6.11.2",
-    "react-toastify": "^9.1.3",
+    "react-toastify": "10.0.4",
+    "react-virtualized-auto-sizer": "^1.0.21",
+    "react-window": "^1.8.10",
     "semantic-ui-css": "^2.5.0",
     "semantic-ui-react": "3.0.0-beta.0",
     "uuid": "^9.0.0",
@@ -59,6 +63,7 @@
   },
   "devDependencies": {
     "@types/react-datepicker": "^4.11.2",
+    "@types/react-window-infinite-loader": "^1.0.9",
     "@types/uuid": "^9.0.1",
     "@types/yup": "^0.32.0",
     "@typescript-eslint/eslint-plugin": "^6.7.5",
@@ -68,6 +73,6 @@
     "eslint-plugin-react-hooks": "^4.6.0",
     "eslint-plugin-react-refresh": "^0.4.3",
     "typescript": "^5.2.2",
-    "vite": "^4.4.11"
+    "vite": "5.0.12"
   }
 }

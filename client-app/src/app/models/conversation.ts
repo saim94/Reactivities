@@ -1,12 +1,14 @@
-import { Message } from "./message";
+import { ChatMessage } from "./chatMessage";
 import { User } from "./user";
 
 export interface Conversation {
     conversationId: number;
-    user1_Id: string;
-    user1: User;
-    user2_Id: string;
-    user2: User;
-    messages: Message[];
-    latestMessage: Message | null;
+    currentUserId: string;
+    currentUser: User;
+    otherUserId: string;
+    otherUser: User;
+    messages: ChatMessage[];
+    unreadMessageCount: number;
+    firstUnreadMessageId: number;
+    //latestMessage: ChatMessage | null;
 }

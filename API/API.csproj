@@ -47,6 +47,7 @@
 	  <Compile Include="Controllers\MessagesController.cs" />
 	  <Compile Include="Controllers\PhotosController.cs" />
 	  <Compile Include="Controllers\ProfilesController.cs" />
+	  <Compile Include="Controllers\UserController.cs" />
 	  <Compile Include="Controllers\WeatherForecastController.cs" />
 	  <Compile Include="DTOs\FacebookDto.cs" />
 	  <Compile Include="DTOs\LoginDto.cs" />
@@ -91,7 +92,7 @@
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.18.1" />
 		<PackageReference Include="NWebsec.AspNetCore.Middleware" Version="3.0.0" />
 		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.5.0" />
-		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.30.1" />
+		<PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.34.0" />
 	</ItemGroup>
 
 	<ItemGroup>

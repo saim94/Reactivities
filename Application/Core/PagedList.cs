@@ -1,4 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Application.ReturnDTOs;
+using AutoMapper;
+using AutoMapper.QueryableExtensions;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,5 +33,22 @@ namespace Application.Core
             var items = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
             return new PagedList<T>(items, count, pageNumber, pageSize);
         }
+
+        public static async Task<PagedList<TDestination>> CreateAsync<TSource, TDestination>(
+            IQueryable<TSource> source, IMapper mapper, int pageNumber, int pageSize)
+        {
+            var count = await source.CountAsync();
+
+            var items = await source.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync();
+
+            var mappedItems = mapper.Map<List<TDestination>>(items);
+
+            //mappedItems.AddRange(mappedItems);
+            //mappedItems.AddRange(mappedItems);
+            //mappedItems.AddRange(mappedItems);
+
+            return new PagedList<TDestination>(mappedItems, count, pageNumber, pageSize);
+        }
+
     }
 }

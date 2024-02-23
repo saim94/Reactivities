@@ -1,8 +1,8 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
 import { Activity, ActivityFormValues } from '../models/activity';
+import { ChatMessage } from '../models/chatMessage';
 import { Conversation } from '../models/conversation';
-import { Message } from '../models/message';
 import { PaginatedResult, PagingParams } from '../models/pagination';
 import { Photo, Profile, UserActivity } from '../models/profile';
 import { User, UserFormValues } from '../models/user';
@@ -18,8 +18,6 @@ const sleep = (delay: number) => {
 //axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 axios.defaults.baseURL = import.meta.env.VITE_API_URL;
 //axios.defaults.headers.Authorization = `bearer ${localStorage.getItem('jwt')}`;
-
-
 axios.interceptors.request.use(config => {
     const token = store.commonStore.token;
     if (token && config.headers) config.headers.Authorization = `bearer ${token}`;
@@ -37,7 +35,7 @@ axios.interceptors.response.use(async response => {
     return response;
 
 }, (error: AxiosError) => {
-    
+    //debugger
     const { data, status, config, headers } = error.response as AxiosResponse;
     switch (status) {
         case 400:
@@ -118,9 +116,13 @@ const Account = {
 }
 
 const Conversations = {
-    get: (userName: string) => requests.get<PaginatedResult<Conversation>>(`/conversations/${userName}`),
+    //list: () => requests.get<PaginatedResult<Conversation[]>>('/conversations'),
+    list: (id: string, params: PagingParams) => axios.get<PaginatedResult<Conversation[]>>(`/conversations?id=${id}`, { params }).then(responseBody),
+    get: (userName: string) => requests.get<Conversation>(`/conversations/${userName}`),
     delete: (conversationId: number) => requests.del<void>(`/conversations/${conversationId}`),
-    getMessages: (conversationId: number, params: PagingParams) => axios.get<PaginatedResult<Message[]>>(`/messages/${conversationId}`, { params })
+    getMessages: (conversationId: number, params: PagingParams) => axios.get<PaginatedResult<ChatMessage[]>>(`/messages/${conversationId}`, { params }),
+    search: (searchQuery: string) => requests.get<Profile[]>(`/user?searchQuery=${searchQuery}`),
+    count: () => requests.get<number>('/user/Count')
 }
 
 const Profiles = {

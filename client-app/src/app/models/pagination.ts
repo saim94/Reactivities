@@ -1,4 +1,17 @@
-export interface Pagination {
+export interface IPagination {
+    currentPage: number;
+    itemsPerPage: number;
+    totalItems: number;
+    totalPages: number;
+}
+
+export class Pagination implements IPagination {
+    constructor(currentPage: number, itemsPerPage: number, totalItems: number, totalPages: number) {
+        this.currentPage = currentPage;
+        this.itemsPerPage = itemsPerPage;
+        this.totalItems = totalItems;
+        this.totalPages = totalPages;
+    }
     currentPage: number;
     itemsPerPage: number;
     totalItems: number;

@@ -9,6 +9,7 @@ namespace Application.Profiles
 {
     public class Profile
     {
+        public string Id { get; set; }
         public string Username { get; set; }
         public string DisplayName { get; set; }
         public string Bio { get; set; }
@@ -16,6 +17,9 @@ namespace Application.Profiles
         public bool Following { get; set; }
         public int FollowersCount { get; set; }
         public int FollowingCount { get; set; }
+        public int UnreadMessageCount { get; set; }
+        public int FirstUnreadMessageId { get; set; }
         public ICollection<Photo> Photos { get; set; }
+
     }
 }

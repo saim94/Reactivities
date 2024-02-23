@@ -6,7 +6,7 @@ export default function CommentPlaceholder() {
             <Comment>
                 <Comment.Avatar as={Placeholder} />
                 <Comment.Content>
-                    <Placeholder>
+                    <Placeholder fluid>
                         <Placeholder.Header>
                             <Placeholder.Line />
                             <Placeholder.Line />

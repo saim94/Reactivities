@@ -55,8 +55,8 @@ export default class UserStore {
         store.commonStore.setToken(null);
         store.activityStore.resetStore();
         store.commentStore.resetStore();
-        store.conversationStore.resetStore();
-        store.profileStore.resetStore();
+        store.conversationStore.resetConversationStore();
+        store.profileStore.resetProfileStore();
         this.user = null;
         router.navigate('/')
     }

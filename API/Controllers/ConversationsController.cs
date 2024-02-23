@@ -1,4 +1,5 @@
 ﻿using Application.Conversations;
+using Application.Core;
 using Domain;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,19 +10,13 @@ namespace API.Controllers
         [HttpGet("{userName}")]
         public async Task<IActionResult> GetConversation(string userName)
         {
-            return HandleTypedResult(await Mediator.Send(new Details.Query { RecipientUserName = userName }));
+            return HandleResult(await Mediator.Send(new Details.Query { RecipientUserName = userName }));
         }
 
-        //[HttpGet("{userName}")]
-        //public async Task<IActionResult> GetConversationPaged(string userName)
-        //{
-        //    return HandleResult(await Mediator.Send(new DetailsPaged.Query { RecipientUserName = userName }));
-        //}
-
         [HttpGet]
-        public async Task<IActionResult> GetConversations()
+        public async Task<IActionResult> GetConversations([FromQuery] PagingParams param, string id = "")
         {
-            return HandleResult(await Mediator.Send(new List.Query()));
+            return HandlePagedResult(await Mediator.Send(new List.Query { Params = param, Id = id }));
         }
 
         [HttpDelete("{conversationId}")]

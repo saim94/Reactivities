@@ -1,4 +1,5 @@
 export interface IUser {
+    id: string,
     username: string,
     userName: string,
     displayName: string,
@@ -8,12 +9,14 @@ export interface IUser {
 
 export class User implements IUser {
     constructor() {
+        this.id = ''
         this.username = '';
         this.userName = '';
         this.displayName = '';
         this.image = '';
         this.token = '';
     }
+    id: string
     username: string
     userName: string
     displayName: string

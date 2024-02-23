@@ -31,6 +31,10 @@ export default class ProfileStore {
         )
     }
 
+    setProfile = (value: Profile) => {
+        this.profile = value;
+    }
+
     setActiveTab = (activeTab: number | string | undefined) => {
         this.activeTab = activeTab;
     }
@@ -188,7 +192,7 @@ export default class ProfileStore {
         }
     }
 
-    resetStore = () => {
+    resetProfileStore = () => {
         this.currentUserProfile = null;
         this.profile = null;
         this.loadingProfile = false;

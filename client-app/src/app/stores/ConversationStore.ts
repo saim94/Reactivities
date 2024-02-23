@@ -1,11 +1,13 @@
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr";
 import { format } from "date-fns";
 import { makeAutoObservable, runInAction } from "mobx";
+import { ConcatenateConversations_V2, FindConversation, FindConversationByUserName } from "../../utils/helper";
 import agent from "../api/agent";
+import { ChatMessage } from "../models/chatMessage";
 import { Conversation } from "../models/conversation";
-import { Message } from "../models/message";
 import { MessageData } from "../models/messageData";
 import { Pagination, PagingParams } from "../models/pagination";
+import { Profile } from "../models/profile";
 import { User } from "../models/user";
 import { store } from "./Store";
 
@@ -19,18 +21,44 @@ export default class ConversationStore {
     shouldReconnect = true;
     inboxOpen = false;
     pagination: Pagination | null = null;
-    pagingParams = new PagingParams();
+    paginationConversation: Pagination | null = null;
+    pagingParams = new PagingParams(1, 10);
+    pagingParamsConversation = new PagingParams(1, 10);
     loadingMessages = false;
+    loadingConversations = false;
     loadingInitial = false;
     unReadMessageCount = 0;
     firstUnread_MessageId = 0;
     lastUnread_MessageId = 0;
     newMessage = false;
-    fetchMessages = false;
 
     constructor() {
         makeAutoObservable(this);
     }
+
+    setSelectedConversation = (value: Conversation | null) => {
+        runInAction(() => {
+            this.selectedConversation = value;
+        })
+    }
+
+    setUnReadMessageCount = (value: number) => {
+        this.unReadMessageCount = value;
+    }
+    setFirstUnread_MessageId = (value: number) => {
+        this.firstUnread_MessageId = value;
+    }
+
+    setFirstUnread_MessageIdCalBack = (value: number) => {
+        this.firstUnread_MessageId = value;
+        return this.firstUnread_MessageId;
+    }
+
+    setUnReadMessageCountCalBack = (value: number) => {
+        this.unReadMessageCount = value;
+        return this.unReadMessageCount;
+    }
+
     setOpenInbox = (value: boolean) => {
         this.inboxOpen = value;
     }
@@ -52,17 +80,18 @@ export default class ConversationStore {
     setPagingParams = (pagingParams: PagingParams) => {
         this.pagingParams = pagingParams;
     }
+    setPagingParamsConversation = (pagingParams: PagingParams) => {
+        this.pagingParamsConversation = pagingParams;
+    }
     setLoadingInitial = (value: boolean) => {
         this.loadingInitial = value;
     }
     setNewMessage = (value: boolean) => {
         this.newMessage = value;
     }
-    setFetchMessages = (value: boolean) => {
-        this.fetchMessages = value;
+    setLoadingConversations = (value: boolean) => {
+        this.loadingConversations = value;
     }
-
-
 
     createHubConnection = async () => {
         //debugger;
@@ -87,36 +116,31 @@ export default class ConversationStore {
 
         this.hubConnection.on('UpdateMessageStatus', this.UpdateMessageStatus);
 
+        this.hubConnection.on('ReceiveMatchedUsers', this.ReceiveMatchedUsers);
+
         this.hubConnection.onclose(() => {
-            //console.log('OnCloseCalled');
             if (this.shouldReconnect) {
                 this.createHubConnection();
             }
         });
     };
 
-    GetMessages = async (conversationId: number) => {
-        //debugger;
-        //this.loadingMessages = true;
+    GetMessages = async (conversationId: number, pageSize?: number) => {
+
         this.setLoadingMessages(true);
         if (!this.connectionCheck)
             await this.createHubConnection();
-        //this.hubConnection?.invoke(`GetMessages/${conversationId}?pageNumber="${this.pagingParams.pageNumber}"&pageSize="${this.pagingParams.pageSize}"`)
-        //    .then(() => { console.log('Messages loaded'); this.loadingMessages = false })
-        //    .catch((error: any) => { console.log('Error loading messages:' + error); this.loadingMessages = false; });
-        const messageId = (this.selectedConversation!.messages.length > 0) ?
-            this.selectedConversation!.messages[this.selectedConversation!.messages.length - 1].messageId : 0;
-        this.hubConnection?.invoke(`GetMessages`, conversationId, messageId, this.pagingParams)
-            .then(() => console.log('Messages loaded'))
-            .catch((error: Error) => { console.log('Error loading messages:' + error); this.setLoadingMessages(false) });
 
+        if (pageSize) this.pagingParams.pageSize = pageSize;
+        this.hubConnection?.invoke(`GetMessages`, conversationId, this.pagingParams)
+            //.then(() => console.log('Messages loaded'))
+            .catch((error: Error) => { console.log('Error loading messages:' + error); this.setLoadingMessages(false) });
     }
 
-    ReceivePreviousMessages = (messages: Message[], pagination: Pagination) => {
-
+    ReceivePreviousMessages = (messages: ChatMessage[], pagination: Pagination) => {
         if (messages.length > 0 && messages[0].conversationId === this.selectedConversation?.conversationId) {
             runInAction(() => {
-                //debugger;
+
                 const newMessages = messages.filter(message => {
                     // Check if the message with the same ID already exists in the array
                     const exists = this.selectedConversation?.messages.some(existingMessage => existingMessage.messageId === message.messageId);
@@ -127,17 +151,15 @@ export default class ConversationStore {
                     message.sentAt = new Date(message.sentAt);
                     this.selectedConversation?.messages.push(message);
                 });
-
+                this.setLoadingMessages(false);
+                this.setNewMessage(false);
                 this.setPagination(pagination);
             });
         }
-        this.setLoadingMessages(false);
-        this.setNewMessage(false);
-        this.setFetchMessages(true);
+
     }
 
     UpdateMessageStatus = (messageId: number) => {
-        //debugger;
         if (this.selectedConversation) {
             const { messages } = this.selectedConversation || {};
 
@@ -152,28 +174,63 @@ export default class ConversationStore {
                 this.selectedConversation.messages = updatedMessages;
             }
         }
+
+        const existingConversation = this.findConversationByMessageId(messageId);
+        if (existingConversation) {
+            const { messages } = existingConversation || {};
+
+            if (messages) {
+                const updatedMessages = messages.map(message => {
+                    if (message.messageId <= messageId && message.sender.userName === store.userStore.user?.userName) {
+                        return { ...message, isRead: true };
+                    }
+                    return message;
+                });
+                existingConversation.messages = updatedMessages;
+            }
+        }
     };
 
     handleDeleteMessage = (messageId: number) => {
-        //debugger;
-
         if (messageId > 0) {
-            const updatedMessages = this.selectedConversation!.messages.filter(
-                (m) => m.messageId !== messageId
-            );
-            this.selectedConversation!.messages = updatedMessages;
-            if (this.selectedConversation!.messages.length === 0) {
-                this.selectedConversation!.conversationId = 0;
-                this.selectedConversation!.latestMessage = new Message(0, '', new Date(), false);
-                this.selectedConversation!.user1_Id = '';
-                this.selectedConversation!.user2_Id = '';
-                this.selectedConversation!.user1 = new User();
-                this.selectedConversation!.user2 = new User();
-                this.selectedConversation!.messages = [];
+            if (this.selectedConversation) {
+                const updatedMessages = this.selectedConversation!.messages.filter(
+                    (m) => m.messageId !== messageId
+                );
+                this.selectedConversation!.messages = updatedMessages;
+                if (this.selectedConversation!.messages.length === 0) {
+                    this.resetConversation(this.selectedConversation!);
+                }
+            }
+            // Check if the conversation already exists in the conversations array
+            const existingConversation = this.findConversationByMessageId(messageId);
+
+            if (existingConversation) {
+                // Conversation already exists, update it with the latest message
+                const updatedMessages = existingConversation.messages.filter(
+                    (m) => m.messageId !== messageId
+                );
+                existingConversation.messages = updatedMessages;
+                if (existingConversation.messages.length === 0) {
+                    this.resetConversation(existingConversation);
+                }
+            }
+
+        }
+
+    };
+
+    findConversationByMessageId = (messageId: number): Conversation | undefined => {
+        for (const conversation of this.conversations) {
+            const foundMessage = conversation.messages.find(msg => msg.messageId === messageId);
+            if (foundMessage) {
+                return conversation;
             }
         }
-        //this.isdeleting = false;
+
+        return undefined;
     };
+
 
     deleteConversation = async (conversationId: number) => {
         this.isdeleting = true;
@@ -181,8 +238,14 @@ export default class ConversationStore {
             await agent.Conversations.delete(conversationId);
             runInAction(() => {
                 this.isdeleting = false;
-                this.selectedConversation!.conversationId = 0;
-                this.selectedConversation!.messages = [];
+                if (this.selectedConversation && this.selectedConversation.conversationId === conversationId) {
+                    this.selectedConversation.messages = [];
+                }
+
+                const existingConversation = FindConversation(this.conversations, conversationId);
+                if (existingConversation) {
+                    existingConversation.messages = [];
+                }
             })
         } catch (error) {
             console.log(error)
@@ -202,7 +265,7 @@ export default class ConversationStore {
         };
 
         this.hubConnection?.invoke('DeleteMessage', data)
-            .then(() => console.log('Message deleted'))
+            //.then(() => console.log('Message deleted'))
             .catch(error => console.error('Failed to delete message:', error));
     };
 
@@ -211,73 +274,56 @@ export default class ConversationStore {
     }
 
     updateIsRead = async (messageId: number) => {
-        //if (!this.fetchMessages) {
-        //console.log('called');
-        if (this.newMessage) {
-            const message = this.selectedConversation?.messages.find(x => x.messageId === messageId);
-            message!.isRead = true;
-            this.setNewMessage(false);
-            //this.firstUnread_MessageId = 0;
-            //this.unReadMessageCount = 0;
-        } else {
-            this.updateUnreadMessages(messageId);
-            //this.firstUnread_MessageId = 0;
-            //this.unReadMessageCount = 0;
-        }
+        //if (this.newMessage) {
+        //    const message = this.selectedConversation?.messages.find(x => x.messageId === messageId);
+        //    if (message) {
+        //        message!.isRead = true;
+        //    }
+
+        //    this.setNewMessage(false);
+        //    runInAction(() => {
+        //        debugger;
+        //        if (this.selectedConversation) {
+        //            this.selectedConversation.firstUnreadMessageId = 0;
+        //            this.selectedConversation.unreadMessageCount = 0;
+        //        }
+        //    })
+
+
+        //    //this.setFirstUnread_MessageIdCalBack(0);
+        //} else {
+        this.updateUnreadMessages(messageId);
+        //}
         if (!this.connectionCheck)
             await this.createHubConnection();
+
         const data = {
             messageId: messageId.toString(),
             conversationId: this.selectedConversation?.conversationId.toString(),
             senderName: this.selectedConversation?.messages.find(x => x.messageId === messageId)?.sender.userName,
         };
-        //console.log(data);
+        this.updateMessageStatus(data);
+    }
+
+    updateMessageStatus = (data: { messageId: string, conversationId: string | undefined, senderName: string | undefined }) => {
         this.hubConnection!.invoke('UpdateIsRead', data)
-            .then(() => console.log('message status updated'))
+            //.then(() => console.log('message status updated'))
             .catch((error: Error) => {
                 console.error('Failed to update message status: ', error);
             });
-
-
-        //var message = this.selectedConversation?.messages.find(x => x.messageId === messageId);
-        //if (this.inboxOpen && message!.sender.userName !== store.userStore.user?.userName) {
-        //console.log('called');
-        //var count = this.getUnReadMessageCount;
-        //if (count > 1)
-        //    this.unReadMessageCount = count;  ///BACK HERE
-        ////var lastMessage = this.selectedConversation.messages.find(x => x.messageId === conversation.latestMessage?.messageId);
-        //message!.isRead = true;
-
-        //if (!this.connectionCheck)
-        //    await this.createHubConnection(1);
-        //const data = {
-        //    messageId: messageId.toString(),
-        //    conversationId: this.selectedConversation?.conversationId.toString()!,
-        //    senderName: this.selectedConversation?.messages.find(x => x.messageId === messageId)?.sender.userName,
-        //};
-        //console.log(data);
-        //this.hubConnection!.invoke('UpdateIsRead', data)
-        //    .then(() => console.log('message status updated'))
-        //    .catch((error: any) => {
-        //        console.error('Failed to update message status: ', error);
-        //    });
-        //this.ModifyPagination('add');
-        //}
-        //}
-        //this.setFetchMessages(false);
     }
 
     updateUnreadMessages = (messageId: number) => {
-        this.getUnreadMessages
-            .filter(message => message.messageId <= messageId && message.sender.userName !== store.userStore.user?.userName)
-            .forEach(message => { message.isRead = true });
+        const messages = this.getUnreadMessages
+            .filter(message => message.messageId <= messageId && message.sender.userName !== store.userStore.user?.userName);
+        store.commonStore.setUnReadMessageCount(store.commonStore.unReadMessageCount - messages.length);
+        messages.forEach(message => { message.isRead = true });
     }
 
     private sendMessage = (messageData: MessageData) => {
-        //debugger;
         this.setIsSubmitting(true);
         this.hubConnection!.invoke('SendMessage', messageData)
-            .then(() => console.log('Message sent'))
+            //.then(() => console.log('Message sent'))
             .catch((error: Error) => {
                 console.error('Failed to send message:', error);
                 this.setIsSubmitting(false);
@@ -287,47 +333,92 @@ export default class ConversationStore {
     send = async (messageData: MessageData) => {
         if (!this.connectionCheck)
             await this.createHubConnection();
-        this.firstUnread_MessageId = 0;
-        this.unReadMessageCount = 0;
-        this.sendMessage(messageData);
+        runInAction(() => {
+            this.firstUnread_MessageId = 0;
+            this.unReadMessageCount = 0;
+            this.sendMessage(messageData);
+        })
     };
 
-    ReceiveMessage = (conversation: Conversation) => {
-        conversation.messages.forEach(con => { con.sentAt = new Date(con.sentAt) })
-        conversation.latestMessage!.sentAt = new Date(conversation.latestMessage!.sentAt);
-        /*if (this.inboxOpen) { debugger; conversation.latestMessage!.isRead = true; this.updateisRead(conversation.latestMessage!.messageId) }*/
-        //debugger;
+
+
+    ReceiveMessage = (message: ChatMessage) => {
+        message.sentAt = new Date(message.sentAt);
         runInAction(() => {
+            this.setNewMessage(true);
             this.setIsSubmitting(false);
-            //debugger;
-            if (this.selectedConversation === undefined || this.selectedConversation?.conversationId === 0) {
-                this.selectedConversation = conversation;
+            if (!this.selectedConversation || this.selectedConversation?.conversationId === 0) {
+                this.selectedConversation = this.CreateConversation(message, (store.userStore.user) ? store.userStore.user : new User());
             }
             else {
-                if (conversation.conversationId === this.selectedConversation?.conversationId) {
-                    this.selectedConversation?.messages.push(conversation.latestMessage!);
-                    this.setNewMessage(true);
-                    this.setFetchMessages(false);
-                    //console.log('Inbox Open' + this.inboxOpen)
-                    if (!this.inboxOpen) {
-                        this.unReadMessageCount = this.getUnReadMessageCount;
-                        this.firstUnread_MessageId = this.getFirstUnreadMessageId();
+                if (message.conversationId === this.selectedConversation?.conversationId) {
+                    this.selectedConversation?.messages.push(message);
+                    if (this.inboxOpen && message.sender.userName !== store.userStore.user?.userName) {
+                        this.selectedConversation.unreadMessageCount++;
+                        if (this.selectedConversation.firstUnreadMessageId === 0) {
+                            this.selectedConversation.firstUnreadMessageId = message.messageId
+                        }
+                        message.isRead = true;
+                        const data = {
+                            messageId: message.messageId.toString(),
+                            conversationId: this.selectedConversation?.conversationId.toString(),
+                            senderName: this.selectedConversation?.messages.find(x => x.messageId === message.messageId)?.sender.userName,
+                        };
+                        this.updateMessageStatus(data);
                     }
-                    else
-                        this.firstUnread_MessageId = 0;
-                    //if (this.inboxOpen && conversation.latestMessage?.sender.userName !== store.userStore.user?.userName) {
-                    //    console.log('called');
-                    //    var lastMessage = this.selectedConversation.messages.find(x => x.messageId === conversation.latestMessage?.messageId);
-                    //    lastMessage!.isRead = true;
-                    //    this.updateisRead(lastMessage!.messageId);
-                    //    //this.ModifyPagination('add');
-                    //}
+                    if (message.sender.userName !== store.userStore.user?.userName)
+                        store.commonStore.unReadMessageCount++;
+                    this.setNewMessage(false);
+                }
+            }
+            // Check if the conversation already exists in the conversations array
+            let existingConversation = FindConversation(this.conversations, message.conversationId);
+
+            if (!existingConversation) existingConversation = FindConversationByUserName(this.conversations, message.sender.userName);
+
+            if (existingConversation) {
+                const existingMessageIndex = existingConversation.messages.findIndex(
+                    msg => msg.messageId === message.messageId
+                );
+
+                if (existingMessageIndex === -1) {
+                    // Message doesn't exist, add it
+                    existingConversation.messages.push(message);
+                    existingConversation.unreadMessageCount++;
+                    if (existingConversation.firstUnreadMessageId === 0) {
+                        existingConversation.firstUnreadMessageId = message.messageId
+                    }
                 }
 
+                // Conversation already exists, update it with the latest message
             }
-            this.selectedConversation!.latestMessage = null;
+            else
+                this.conversations.push(this.CreateConversation(message, (store.userStore.user) ? store.userStore.user : new User()));
         });
     }
+
+    CreateConversation = (message: ChatMessage, loggendInUser: User) => {
+        const current_User: User = { ...loggendInUser };
+
+        const existingconversation = FindConversation(this.conversations, message.conversationId);//find is conversation already exists
+
+        if (existingconversation)
+            return existingconversation;
+
+        const conversation: Conversation = {
+            conversationId: message.conversationId,
+            currentUser: current_User,
+            currentUserId: current_User.id,
+            messages: [message],
+            otherUser: message.sender,
+            otherUserId: message.sender.id,
+            unreadMessageCount: 0,
+            firstUnreadMessageId: 0
+        };
+
+        return conversation;
+    }
+
 
     ModifyPagination = (predicate: string) => {
         if (this.pagination) {
@@ -347,18 +438,15 @@ export default class ConversationStore {
         this.setLoadingConversation(true);
         try {
             const result = await agent.Conversations.get(userName);
-            result.data.messages.forEach(con => { con.sentAt = new Date(con.sentAt) })
+            result.messages.forEach(con => { con.sentAt = new Date(con.sentAt) })
             runInAction(() => {
-                this.selectedConversation = result.data;
+                this.selectedConversation = result;
                 this.createHubConnection();
-                this.setPagination(result.pagination);
                 this.setLoadingConversation(false);
                 this.loadingInitial = true;
                 this.unReadMessageCount = this.getUnReadMessageCount;
-                this.firstUnread_MessageId = this.getFirstUnreadMessageId();
-                //this.lastUnread_MessageId = this.getLastUnreadMessageId();
+                this.firstUnread_MessageId = this.getfirstUnreadMessageId;
                 this.setNewMessage(false);
-                //this.setFetchMessages(true);
             })
         } catch (error) {
             console.log(error);
@@ -366,18 +454,44 @@ export default class ConversationStore {
         }
     }
 
+    listConversations = async (id?: string) => {
+        if (this.pagingParamsConversation.pageNumber < 2)
+            this.setLoadingInitial(true);
+        else
+            this.setLoadingConversations(true);
+        try {
+            if (!id) id = '';
+
+            const result = await agent.Conversations.list(id, this.pagingParamsConversation);
+            result.data.forEach(c => c.messages.forEach(m => { m.sentAt = new Date(m.sentAt) }));
+            runInAction(() => {
+
+                ConcatenateConversations_V2(result.data, this.conversations);
+                this.paginationConversation = result.pagination;
+                if (result.data.length === 0 && this.selectedConversation?.conversationId === 0) {
+                    this.selectedConversation = null;
+                }
+
+                this.setLoadingInitial(false);
+                this.setLoadingConversations(false);
+            })
+        } catch (error) {
+            console.log(error);
+            this.setLoadingInitial(false);
+            this.setLoadingConversations(false);
+        }
+    }
+
     get getUnreadMessages() {
-        //debugger;
         const currentUser = store.userStore.user?.userName;
         return this.selectedConversation?.messages
-            .filter(message => message.sender.userName !== currentUser && !message.isRead)
-            .reverse() || [];
+            .filter(message => message.sender.userName !== currentUser && !message.isRead).
+            sort((a, b) => a.sentAt.getTime() - b.sentAt.getTime()) || [];
     }
 
     get lastUnreadMessageId() {
-        //debugger;
         const unreadMessages = this.getUnreadMessages;
-        return unreadMessages.length > 0 ? unreadMessages[unreadMessages.length - 1].messageId : 0;
+        return unreadMessages.length > 0 ? unreadMessages[0].messageId : 0;
     }
 
     get_UnreadMessages = () => {
@@ -388,16 +502,8 @@ export default class ConversationStore {
     }
 
     getLastUnreadMessageId = () => {
-        //debugger;
         const unreadMessages = this.get_UnreadMessages();
-        //debugger;
         return unreadMessages.length > 0 ? unreadMessages[unreadMessages.length - 1].messageId : 0;
-        //return unreadMessages.length > 0 ? unreadMessages[0].messageId : 0;
-    }
-
-    getFirstUnreadMessageId = () => {
-        const unreadMessages = this.getUnreadMessages;
-        return unreadMessages.length > 0 ? unreadMessages[0].messageId : 0;
     }
 
     get_UnReadMessageCount = () => {
@@ -409,8 +515,7 @@ export default class ConversationStore {
         ).length;
     }
 
-    get firstUnreadMessageId() {
-        //debugger;
+    get getfirstUnreadMessageId() {
         const unreadMessages = this.getUnreadMessages;
         return unreadMessages.length > 0 ? unreadMessages[0].messageId : 0;
     }
@@ -427,7 +532,7 @@ export default class ConversationStore {
                 const date = format(message.sentAt!, 'dd MMM yyyy');
                 messages[date] = messages[date] ? [...messages[date], message] : [message];
                 return messages;
-            }, {} as { [key: string]: Message[] })
+            }, {} as { [key: string]: ChatMessage[] })
         )
     }
 
@@ -438,6 +543,23 @@ export default class ConversationStore {
         return messages.filter(message =>
             message.sender.userName !== currentUser && !message.isRead
         ).length;
+    }
+
+    Search = async (searchQuery: string) => {
+        if (!this.connectionCheck)
+            await this.createHubConnection();
+        this.hubConnection?.invoke('SearchUsers', searchQuery)
+            .catch((error: Error) => console.log(error));
+    }
+
+    ReceiveMatchedUsers = (newUsers: Profile[]) => {
+
+        if (newUsers.length === 0) {
+            // If the newUsers array is empty, reset the matchedUsers array in CommonStore
+            store.commonStore.matchedUsers = [];
+        } else {
+            store.commonStore.matchedUsers = newUsers;
+        }
     }
 
     stopHubConnection() {
@@ -454,14 +576,91 @@ export default class ConversationStore {
         }
     }
 
-    resetStore = () => {
+    emptyconversations = () => {
         this.conversations = [];
+        this.pagingParamsConversation = new PagingParams(1, 10);
+        this.paginationConversation = null;
+    }
+
+    resetConversationStore = () => {
+        this.emptyconversations();
         this.selectedConversation = null;
         this.pagination = null;
-        //this.pagingParams = new PagingParams();
+        this.paginationConversation = null;
+        this.conversations = []
         if (this.hubConnection?.state === HubConnectionState.Connected)
             this.stopHubConnection();
     }
+
+    resetConversation = (conversation: Conversation) => {
+        //conversation!.conversationId = 0;
+        //conversation!.latestMessage = new ChatMessage(0, '', new Date(), false);
+        //conversation!.user1_Id = '';
+        //conversation!.user2_Id = '';
+        //conversation!.user1 = new User();
+        //conversation!.user2 = new User();
+        conversation!.messages = [];
+    }
+
+
+    //emptyTempConversation = () => {
+    //    //debugger;
+    //    if (this.tempConversation && this.tempConversation.conversationId === 0) {
+    //        this.tempConversation = {
+    //            conversationId: -1, currentUser: new User, otherUser: new User(),
+    //            currentUserId: '', otherUserId: '', messages: []
+    //        }
+    //    }
+    //    //this.tempConversation = null;
+    //}
+
+    //ReceiveMessage = (conversation: Conversation) => {
+    //    //console.log('MessageReceived ' + conversation.latestMessage?.conversationId);
+    //    conversation.messages.forEach(con => { con.sentAt = new Date(con.sentAt) });
+    //    //conversation.latestMessage!.sentAt = new Date(conversation.latestMessage!.sentAt);
+    //    runInAction(() => {
+
+    //        this.setIsSubmitting(false);
+    //        //debugger
+    //        if (!this.selectedConversation || this.selectedConversation?.conversationId === 0) {
+    //            this.selectedConversation = conversation;
+    //        }
+    //        else {
+    //            if (conversation.conversationId === this.selectedConversation?.conversationId) {
+    //                this.selectedConversation?.messages.push(conversation.messages[0]);
+    //                this.setNewMessage(true);
+    //                //if (!this.inboxOpen) {
+    //                //this.setFirstUnread_MessageId(0);
+    //                //this.setUnReadMessageCount(0);
+    //                //this.unReadMessageCount = 0;
+    //                //this.firstUnread_MessageId = 0;
+    //                //}
+    //                //else
+    //                //    this.firstUnread_MessageId = 0;
+    //            }
+    //        }
+    //        //debugger;
+    //        // Check if the conversation already exists in the conversations array
+    //        let existingConversation = FindConversation(this.conversations, conversation.conversationId);
+
+    //        if (existingConversation) {
+    //            const existingMessageIndex = existingConversation.messages.findIndex(
+    //                msg => msg.messageId === conversation.messages[0].messageId
+    //            );
+
+    //            if (existingMessageIndex === -1) {
+    //                // Message doesn't exist, add it
+    //                existingConversation.messages.push(conversation.messages[0]);
+    //            }
+    //            // Conversation already exists, update it with the latest message
+    //            /*existingConversation.messages.push(conversation.latestMessage!)*/
+    //        }
+    //        else
+    //            this.conversations.push(conversation);
+    //        // Clear latestMessage for selectedConversation
+    //        //this.selectedConversation!.latestMessage = null;
+    //    });
+    //}
 
     //ReceivePreviousMessages = (messages: Message[], pagination: Pagination) => {
     //    debugger;
@@ -593,4 +792,31 @@ export default class ConversationStore {
     //		sendMessage(hubConnection, messageData);
     //	});
     //});
+    //ReceiveMessage = (conversation: Conversation) => {
+    //    conversation.messages.forEach(con => { con.sentAt = new Date(con.sentAt) })
+    //    conversation.latestMessage!.sentAt = new Date(conversation.latestMessage!.sentAt);
+    //    //debugger;
+    //    runInAction(() => {
+    //        this.setIsSubmitting(false);
+    //        //debugger;
+    //        if (this.selectedConversation === undefined || this.selectedConversation?.conversationId === 0) {
+    //            this.selectedConversation = conversation;
+    //        }
+    //        else {
+    //            if (conversation.conversationId === this.selectedConversation?.conversationId) {
+    //                this.selectedConversation?.messages.push(conversation.latestMessage!);
+    //                this.setNewMessage(true);
+    //                this.setFetchMessages(false);
+    //                if (!this.inboxOpen) {
+    //                    this.unReadMessageCount = this.getUnReadMessageCount;
+    //                    this.firstUnread_MessageId = this.getFirstUnreadMessageId();
+    //                }
+    //                else
+    //                    this.firstUnread_MessageId = 0;
+    //            }
+
+    //        }
+    //        this.selectedConversation!.latestMessage = null;
+    //    });
+    //}
 }

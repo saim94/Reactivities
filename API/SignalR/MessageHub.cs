@@ -1,14 +1,14 @@
 ﻿using Application.Core;
 using Application.Messages;
 using Application.ReturnDTOs;
+using Application.Users;
 using Domain;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using Newtonsoft.Json.Linq;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using List = Application.Messages.List;
 
 namespace API.SignalR
 {
@@ -35,7 +35,7 @@ namespace API.SignalR
         }
 
         [HttpPost("GetMessages")]
-        public async Task GetMessages(int conversationId, int messageId, PagingParams param)
+        public async Task GetMessages(int conversationId, PagingParams param)
         {
             var result = await _mediator.Send(new List.Query { ConversationId = conversationId, Params = param });
             if (result.IsSuccess)
@@ -52,7 +52,6 @@ namespace API.SignalR
                 await Clients.Caller.SendAsync("ReceivePreviousMessages", result.Value, pagination);
             }
         }
-
 
         [HttpPost("DeleteMessage")]
         public async Task DeleteMessage(Delete.Command command)
@@ -78,7 +77,16 @@ namespace API.SignalR
             {
                 await Clients.User(command.SenderName).SendAsync("UpdateMessageStatus", command.MessageId);
             }
+        }
 
+        [HttpPost("SearchUsers")]
+        public async Task SearchUsers(string searchQuery)
+        {
+            var result = await _mediator.Send(new Application.Users.List.Query { SearchQuery = searchQuery });
+            if (result != null && result.IsSuccess)
+            {
+                await Clients.Caller.SendAsync("ReceiveMatchedUsers", result.Value);
+            }
         }
 
         //[HttpPost("JoinConversation")]

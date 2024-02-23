@@ -19,7 +19,7 @@ namespace Application.Messages
 {
     public class Create
     {
-        public class Command : IRequest<Result<ConversationDto>>
+        public class Command : IRequest<Result<MessageDto>>
         {
             public string RecipientUserName { get; set; }
             public string MessageContent { get; set; }
@@ -34,7 +34,7 @@ namespace Application.Messages
             }
         }
 
-        public class Handler : IRequestHandler<Command, Result<ConversationDto>>
+        public class Handler : IRequestHandler<Command, Result<MessageDto>>
         {
             private readonly DataContext _context;
             private readonly IUserAccessor _userAccessor;
@@ -49,7 +49,7 @@ namespace Application.Messages
                 _mapper = mapper;
             }
 
-            public async Task<Result<ConversationDto>> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<MessageDto>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var sender = await _context.Users.Include(p => p.Photos)
                     .Include(c => c.Conversations).ThenInclude(x => x.Messages)
@@ -97,10 +97,12 @@ namespace Application.Messages
 
                 var result = await _context.SaveChangesAsync() > 0;
 
-                conversation.Messages = conversation.Messages.Where(x => !x.User2Deleted && !x.User1Deleted).ToList();
-                if (result) return Result<ConversationDto>.Success(_mapper.Map<Conversation, ConversationDto>(conversation));
+                //conversation.Messages = conversation.Messages.Where(x => !x.User2Deleted && !x.User1Deleted).ToList();
 
-                return Result<ConversationDto>.Failure("Problem sending message");
+                var newMessage = conversation.Messages.Last();
+                if (result) return Result<MessageDto>.Success(_mapper.Map<Message, MessageDto>(newMessage));
+
+                return Result<MessageDto>.Failure("Problem sending message");
             }
         }
     }

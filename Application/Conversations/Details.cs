@@ -18,11 +18,11 @@ namespace Application.Conversations
 {
     public class Details
     {
-        public class Query : IRequest<Result<ReturnType<ConversationDto>>>
+        public class Query : IRequest<Result<ConversationDto>>
         {
             public string RecipientUserName { get; set; }
         }
-        public class Handler : IRequestHandler<Query, Result<ReturnType<ConversationDto>>>
+        public class Handler : IRequestHandler<Query, Result<ConversationDto>>
         {
             private readonly DataContext _context;
             private readonly IUserAccessor _userAccessor;
@@ -34,7 +34,7 @@ namespace Application.Conversations
                 _userAccessor = userAccessor;
                 _mapper = mapper;
             }
-            public async Task<Result<ReturnType<ConversationDto>>> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<Result<ConversationDto>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var userName = _userAccessor.GetUsername();
                 var conversation = await _context.Conversations
@@ -47,13 +47,10 @@ namespace Application.Conversations
                     );//Modify to optimize
                 if (conversation != null)
                 {
-                    var tempMessage = new List<Message>();
-
                     bool isCurrentUserUser1 = (conversation.User1 != null && conversation.User1.UserName == userName);
                     bool isCurrentUserUser2 = (conversation.User2 != null && conversation.User2.UserName == userName);
                     if (isCurrentUserUser1 && conversation.User1Deleted || isCurrentUserUser2 && conversation.User2Deleted)
                     {
-                        tempMessage.AddRange(conversation.Messages);
                         conversation.Messages.Clear();
                     }
                     else
@@ -61,19 +58,32 @@ namespace Application.Conversations
                         conversation.Messages = conversation.Messages
                             .Where(x => (!x.User1Deleted && isCurrentUserUser1) || (!x.User2Deleted && isCurrentUserUser2))
                             .OrderByDescending(x => x.MessageId) // Assuming you want to sort by MessageId, adjust as needed
+                            .Take(1) //Temporary change to 1 (may change back to 10)
                             .ToList();
                     }
                 }
-                else conversation = new Conversation();
+                else conversation = await CreateTempConversation(request.RecipientUserName);
 
-                var conversationDto = _mapper.Map<Conversation, ConversationDto>(conversation);
+                return Result<ConversationDto>.Success(_mapper.Map<Conversation, ConversationDto>(conversation));
+            }
 
-                //return Result<PagedList<MessageDto>>.Success(
-                //            await PagedList<MessageDto>.CreateAsync(query, request.Params.PageNumber,
-                //            request.Params.PageSize)
-                //            );
-
-                return Result<ReturnType<ConversationDto>>.Success(ReturnType<ConversationDto>.Create(conversationDto, 1, 10));
+            private async Task<Conversation> CreateTempConversation(string recipientUserName)
+            {
+                var currentUser = await _context.Users.Include(p => p.Photos)
+                    .FirstOrDefaultAsync(x => x.UserName == _userAccessor.GetUsername());
+                var otherUser = await _context.Users.Include(p => p.Photos)
+                    .FirstOrDefaultAsync(x => x.UserName == recipientUserName);
+                var conversation = new Conversation();
+                if (currentUser != null && otherUser != null)
+                {
+                    conversation.User1_Id = currentUser.Id;
+                    conversation.User2_Id = otherUser.Id;
+                    conversation.User1 = currentUser;
+                    conversation.User2 = otherUser;
+                    conversation.ConversationId = 0;
+                    conversation.Messages = new List<Message>();
+                }
+                return conversation;
             }
         }
     }

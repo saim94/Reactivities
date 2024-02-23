@@ -5,12 +5,12 @@ import MyTextInput from "../../app/common/form/MyTextInput";
 import { useStore } from "../../app/stores/Store";
 
 export default observer(function LoginForm() {
-    const { userStore } = useStore();
+    const { userStore, commonStore } = useStore();
     return (
         <Formik
             initialValues={{ email: '', password: '', error: null }}
             onSubmit={(values, { setErrors }) => userStore.login(values).catch(() =>
-                setErrors({ error: 'Invalid email or password' }))}
+                setErrors({ error: 'Invalid email or password' })).finally(() => commonStore.getCount())}
         >
             {({ handleSubmit, isSubmitting, errors }) => (
                 <Form className='ui form' onSubmit={handleSubmit} autoComplete='off'>

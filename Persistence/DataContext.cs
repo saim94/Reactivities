@@ -1,12 +1,15 @@
 ﻿using Domain;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Npgsql;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
+
 
 namespace Persistence
 {
@@ -77,5 +80,31 @@ namespace Persistence
             .WithMany(c => c.Messages)
             .HasForeignKey(m => m.ConversationId);
         }
+
+        //public int GetNextConversationId()
+        //{
+        //    using (var command = Database.GetDbConnection().CreateCommand())
+        //    {
+        //        command.CommandText = "SELECT nextval('\"Conversations_ConversationId_seq\"')";
+        //        Database.OpenConnection();
+        //        using (var result = command.ExecuteReader())
+        //        {
+        //            if (result.Read() && result[0] != DBNull.Value)
+        //            {
+        //                // Value obtained by nextval
+        //                var nextValue = Convert.ToInt32(result[0]);
+
+        //                // If you are using transactions, commit the transaction here
+        //                // Database.CurrentTransaction.Commit();
+
+        //                return nextValue;
+        //            }
+        //        }
+        //    }
+
+
+        //    // Handle the case where the sequence retrieval fails.
+        //    throw new InvalidOperationException("Unable to retrieve the next value from the sequence.");
+        //}
     }
 }

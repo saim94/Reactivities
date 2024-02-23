@@ -21,7 +21,7 @@ export default observer(function ProfileHeader({ profile }: Props) {
                         </Item>
                     </Item.Group>
                 </Grid.Column>
-                <Grid.Column width={4}>
+                <Grid.Column width={4} className='PH_GC'>
                     <Statistic.Group widths={2}>
                         <Statistic label='followers' value={profile.followersCount} />
                         <Statistic label='following' value={profile.followingCount} />

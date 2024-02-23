@@ -1,6 +1,6 @@
 import { User } from "./user"
 
-export interface IMessage {
+export interface IChatMessage {
     messageId: number;
     sender: User;
     content: string;
@@ -11,13 +11,14 @@ export interface IMessage {
     //'User2Deleted': boolean;
 }
 
-export class Message implements IMessage {
+export class ChatMessage implements IChatMessage {
     constructor(messageId: number, content: string, sentAt: Date, isRead: boolean) {
         this.messageId = messageId;
         this.content = content;
         this.sentAt = sentAt;
         this.isRead = isRead;
     }
+
     messageId: number;
     sender: User = new User();
     content: string;

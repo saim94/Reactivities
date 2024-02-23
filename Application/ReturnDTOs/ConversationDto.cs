@@ -7,12 +7,13 @@ namespace Application.ReturnDTOs
     public class ConversationDto
     {
         public int ConversationId { get; set; }
-        public string User1_Id { get; set; }
-        public UserDto User1 { get; set; }
-        public string User2_Id { get; set; }
-        public UserDto User2 { get; set; }
+        public string CurrentUserId { get; set; }
+        public UserDto CurrentUser { get; set; }
+        public string OtherUserId { get; set; }
+        public UserDto OtherUser { get; set; }
         public List<MessageDto> Messages { get; set; }
-        //public PagedList<MessageDto> Messages { get; set; }
-        public MessageDto LatestMessage { get; set; }
+        public int UnreadMessageCount { get; set; }
+        public int FirstUnreadMessageId { get; set; }
+
     }
 }

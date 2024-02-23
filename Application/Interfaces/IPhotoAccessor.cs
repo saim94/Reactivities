@@ -11,6 +11,7 @@ namespace Application.Interfaces
     public interface IPhotoAccessor
     {
         Task<PhotoUploadResult> AddPhoto(IFormFile file);
+        Task<PhotoUploadResult> AddPhoto(string fileName, Stream fileStream);
         Task<string> DeletePhoto(string publicId);
     }
 }

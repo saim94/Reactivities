@@ -4,6 +4,7 @@ export class MessageData implements IMessageData {
         this.recipientUserName = recipientUserName;
         this.connectionId = connectionId
     }
+    [key: string]: string;
     recipientUserName: string;
     messageContent: string;
     connectionId: string;
