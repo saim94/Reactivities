@@ -17,7 +17,7 @@ export default function ChatFooter({ username, send }: Props) {
     const { setSyncPages, setScrollBottom } = commonStore;
 
     const { selectedConversation } = conversationStore;
-
+    username = (selectedConversation) ? selectedConversation?.otherUser.userName : '';
     return (
         <Formik
             initialValues={new MessageData("", username, "")}

@@ -1,3 +1,4 @@
+import { runInAction } from "mobx";
 import { Conversation } from "../app/models/conversation";
 
 export default function GetUnreadMessageCount(currentUserUserName: string, conversation: Conversation) {
@@ -83,3 +84,16 @@ export function ConcatenateConversations_V2(newConversations: Conversation[], co
         }
     });
 }
+
+export function ArrangeConversationsByLatestMessage(conversations: Conversation[]) {
+    runInAction(() => {
+        conversations.sort((conv1, conv2) => {
+            const latestMessageId1 = conv1.messages.length > 0 ? conv1.messages[conv1.messages.length - 1].messageId : 0;
+            const latestMessageId2 = conv2.messages.length > 0 ? conv2.messages[conv2.messages.length - 1].messageId : 0;
+
+            // Sort in descending order based on messageId
+            return latestMessageId2 - latestMessageId1;
+        });
+    });
+}
+

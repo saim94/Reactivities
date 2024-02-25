@@ -260,9 +260,9 @@ namespace Persistence
 
         public static async Task SeedData2(DataContext context, UserManager<AppUser> userManager)
         {
-            //if (!userManager.Users.Any() && !context.Activities.Any())
-            //{
-            var users = new List<AppUser>
+            if (userManager.Users.Count() < 20)
+            {
+                var users = new List<AppUser>
                 {
                     new AppUser { DisplayName = "Bob Johnson", UserName = "bob@example.com", Email = "bob@example.com" },
                     new AppUser { DisplayName = "Jane Smith", UserName = "jane@example.com", Email = "jane@example.com" },
@@ -286,23 +286,23 @@ namespace Persistence
                     new AppUser { DisplayName = "Sam Turner", UserName = "sam@example.com", Email = "sam@example.com" }
                 };
 
-            foreach (var user in users)
-            {
-                await userManager.CreateAsync(user, "Pa$$w0rd");
-            }
-
-            var conversations = new List<Conversation>();
-
-            // Create conversations between all users
-            for (int i = 0; i < users.Count - 1; i++)
-            {
-                for (int j = i + 1; j < users.Count; j++)
+                foreach (var user in users)
                 {
-                    var conversation = new Conversation
+                    await userManager.CreateAsync(user, "Pa$$w0rd");
+                }
+
+                var conversations = new List<Conversation>();
+
+                // Create conversations between all users
+                for (int i = 0; i < users.Count - 1; i++)
+                {
+                    for (int j = i + 1; j < users.Count; j++)
                     {
-                        User1 = users[i],
-                        User2 = users[j],
-                        Messages = new List<Message>
+                        var conversation = new Conversation
+                        {
+                            User1 = users[i],
+                            User2 = users[j],
+                            Messages = new List<Message>
                         {
                             new Message { Sender = users[i], Content = $"Hello {users[j].DisplayName}!", SentAt = DateTime.UtcNow },
                             new Message { Sender = users[j], Content = $"Hi {users[i].DisplayName}!", SentAt = DateTime.UtcNow.AddMinutes(1) },
@@ -311,42 +311,42 @@ namespace Persistence
                             // Add more messages as needed
                             // ...
                         }
-                    };
+                        };
 
-                    conversations.Add(conversation);
+                        conversations.Add(conversation);
+                    }
                 }
-            }
-            var bob = await context.Users.FindAsync("f78a4658-c6c3-4ebf-9d01-0ca51c914178");
-            for (int i = 0; i < users.Count - 1; i++)
-            {
-                var conversation = new Conversation
+                var bob = await context.Users.FindAsync("f78a4658-c6c3-4ebf-9d01-0ca51c914178");
+                for (int i = 0; i < users.Count - 1; i++)
                 {
-                    User1 = bob,
-                    User2 = users[i],
-                    Messages = new List<Message>
+                    var conversation = new Conversation
+                    {
+                        User1 = bob,
+                        User2 = users[i],
+                        Messages = new List<Message>
                         {
                             new Message { Sender = bob, Content = $"Hello {users[i].DisplayName}!", SentAt = DateTime.UtcNow },
                             new Message { Sender = users[i], Content = $"Hi {bob.DisplayName}!", SentAt = DateTime.UtcNow.AddMinutes(1) },
                             new Message { Sender = bob, Content = $"How are You?", SentAt = DateTime.UtcNow.AddMinutes(2) },
                             new Message { Sender = users[i], Content = $"I'm fine", SentAt = DateTime.UtcNow.AddMinutes(3) },
                         }
-                };
+                    };
 
-                conversations.Add(conversation);
+                    conversations.Add(conversation);
+                }
+
+                await context.Conversations.AddRangeAsync(conversations);
+
+                //var activities = new List<Activity>
+                //{
+                //    // Add your existing activities
+                //    // ...
+                //};
+
+                //await context.Activities.AddRangeAsync(activities);
+                await context.SaveChangesAsync();
             }
-
-            await context.Conversations.AddRangeAsync(conversations);
-
-            //var activities = new List<Activity>
-            //{
-            //    // Add your existing activities
-            //    // ...
-            //};
-
-            //await context.Activities.AddRangeAsync(activities);
-            await context.SaveChangesAsync();
         }
-        //}
-        
+
     }
 }

@@ -1,7 +1,7 @@
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr";
 import { format } from "date-fns";
 import { makeAutoObservable, runInAction } from "mobx";
-import { ConcatenateConversations_V2, FindConversation, FindConversationByUserName } from "../../utils/helper";
+import { ArrangeConversationsByLatestMessage, ConcatenateConversations_V2, FindConversation, FindConversationByUserName } from "../../utils/helper";
 import agent from "../api/agent";
 import { ChatMessage } from "../models/chatMessage";
 import { Conversation } from "../models/conversation";
@@ -133,14 +133,14 @@ export default class ConversationStore {
 
         if (pageSize) this.pagingParams.pageSize = pageSize;
         this.hubConnection?.invoke(`GetMessages`, conversationId, this.pagingParams)
-            //.then(() => console.log('Messages loaded'))
+            //.then(() => /*console.log('Messages loaded')*/ this.setLoadingMessages(false))
             .catch((error: Error) => { console.log('Error loading messages:' + error); this.setLoadingMessages(false) });
     }
 
     ReceivePreviousMessages = (messages: ChatMessage[], pagination: Pagination) => {
-        if (messages.length > 0 && messages[0].conversationId === this.selectedConversation?.conversationId) {
-            runInAction(() => {
 
+        runInAction(() => {
+            if (messages.length > 0 && messages[0].conversationId === this.selectedConversation?.conversationId) {
                 const newMessages = messages.filter(message => {
                     // Check if the message with the same ID already exists in the array
                     const exists = this.selectedConversation?.messages.some(existingMessage => existingMessage.messageId === message.messageId);
@@ -151,11 +151,12 @@ export default class ConversationStore {
                     message.sentAt = new Date(message.sentAt);
                     this.selectedConversation?.messages.push(message);
                 });
-                this.setLoadingMessages(false);
-                this.setNewMessage(false);
                 this.setPagination(pagination);
-            });
-        }
+            }
+            this.setLoadingMessages(false);
+            this.setNewMessage(false);
+        });
+
 
     }
 
@@ -331,6 +332,8 @@ export default class ConversationStore {
     };
 
     send = async (messageData: MessageData) => {
+        
+        messageData.recipientUserName = (this.selectedConversation?.otherUser.userName) ? this.selectedConversation?.otherUser.userName : '';
         if (!this.connectionCheck)
             await this.createHubConnection();
         runInAction(() => {
@@ -389,7 +392,7 @@ export default class ConversationStore {
                         existingConversation.firstUnreadMessageId = message.messageId
                     }
                 }
-
+                ArrangeConversationsByLatestMessage(this.conversations);
                 // Conversation already exists, update it with the latest message
             }
             else
@@ -465,7 +468,7 @@ export default class ConversationStore {
             const result = await agent.Conversations.list(id, this.pagingParamsConversation);
             result.data.forEach(c => c.messages.forEach(m => { m.sentAt = new Date(m.sentAt) }));
             runInAction(() => {
-
+                ArrangeConversationsByLatestMessage(result.data);
                 ConcatenateConversations_V2(result.data, this.conversations);
                 this.paginationConversation = result.pagination;
                 if (result.data.length === 0 && this.selectedConversation?.conversationId === 0) {

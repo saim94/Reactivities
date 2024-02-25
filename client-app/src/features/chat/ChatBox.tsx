@@ -13,7 +13,6 @@ interface Props {
 }
 
 export default observer(function Chatbox({ conversation }: Props) {
-
     const { conversationStore } = useStore();
 
     const { selectedConversation, send, setSelectedConversation, getUnReadMessageCount, getfirstUnreadMessageId
@@ -29,7 +28,6 @@ export default observer(function Chatbox({ conversation }: Props) {
     }, [setSelectedConversation, conversation, getUnReadMessageCount, getfirstUnreadMessageId, lastUnreadMessageId]);
 
     useEffect(() => {
-        //debugger;
         if (conversation?.conversationId) {
             GetMessages(conversation.conversationId, 10);
         }
