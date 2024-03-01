@@ -85,6 +85,7 @@ export default observer(function DropDown({ conversationId, messagesCount }: Pro
                 floating
                 options={options}
                 trigger={dropdownTrigger}
+                basic
             />
             <Confirm
                 centered

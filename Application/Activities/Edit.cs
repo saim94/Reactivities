@@ -1,8 +1,10 @@
 ﻿using Application.Core;
+using Application.Interfaces;
 using AutoMapper;
 using Domain;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 using Persistence;
 using System;
 using System.Collections.Generic;
@@ -31,7 +33,6 @@ namespace Application.Activities
         {
             private readonly DataContext _context;
             private readonly IMapper _mapper;
-
             public Handler(DataContext context, IMapper mapper)
             {
                 _context = context;

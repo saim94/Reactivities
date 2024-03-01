@@ -26,6 +26,7 @@ namespace Persistence
         public DbSet<UserFollowing> UserFollowings { get; set; }
         public DbSet<Message> Messages { get; set; }
         public DbSet<Conversation> Conversations { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -79,6 +80,17 @@ namespace Persistence
             .HasOne(m => m.Conversation)
             .WithMany(c => c.Messages)
             .HasForeignKey(m => m.ConversationId);
+
+            builder.Entity<Notification>()
+                        .HasMany(n => n.AppUserNotifications)
+                        .WithOne(aun => aun.Notification)
+                        .HasForeignKey(aun => aun.NotificationId);
+
+            builder.Entity<AppUser>()
+                .HasMany(u => u.Notifications)
+                .WithOne(aun => aun.User)
+                .HasForeignKey(aun => aun.UserId);
+
         }
 
         //public int GetNextConversationId()

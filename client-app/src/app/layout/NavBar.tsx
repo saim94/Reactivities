@@ -21,12 +21,21 @@ export default observer(function NavBar() {
                 </Menu.Item>
                 <Menu.Item position='right'>
                     <Menu.Item position='right'>
-                        <Button as={NavLink} to="/inbox" basic size='mini'>
+                        <Button basic icon circular style={{ marginRight: '3px' }}>
+
+                            {showLabel && unReadMessageCount !== 0 && <Label color='red' floating circular>{1}</Label>}
+                            <Dropdown icon='world' className='icon'>
+                                <Dropdown.Menu>
+                                    <Dropdown.Item>English</Dropdown.Item>
+                                    <Dropdown.Item>Russian</Dropdown.Item>
+                                    <Dropdown.Item>Spanish</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
+                        </Button>
+                        <Button as={NavLink} to="/inbox" basic icon circular>
                             <Icon name='envelope' />
-                            Inbox
                             {showLabel && unReadMessageCount !== 0 && <Label color='red' floating circular>{unReadMessageCount}</Label>}
                         </Button>
-
                     </Menu.Item>
                     <Image src={user?.image || '/assets/user.png'} avatar spaced='right' />
                     <Dropdown pointing='top left' text={user?.displayName}>
