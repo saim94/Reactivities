@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
 import { Activity, ActivityFormValues } from '../models/activity';
+import { AppNotification } from '../models/appNotification';
 import { ChatMessage } from '../models/chatMessage';
 import { Conversation } from '../models/conversation';
 import { PaginatedResult, PagingParams } from '../models/pagination';
@@ -101,10 +102,10 @@ const Activities = {
     list: (params: URLSearchParams) => axios.get<PaginatedResult<Activity[]>>('/activities', { params })
         .then(responseBody),
     details: (id: string) => requests.get<Activity>(`/activities/${id}`),
-    create: (activity: ActivityFormValues) => requests.post<void>(`/activities`, activity),
-    update: (activity: ActivityFormValues) => requests.put<void>(`/activities/${activity.id}`, activity),
+    create: (activity: ActivityFormValues) => requests.post<AppNotification>(`/activities`, activity),
+    update: (activity: ActivityFormValues) => requests.put<AppNotification[]>(`/activities/${activity.id}`, activity),
     delete: (id: string) => requests.del<void>(`/activities/${id}`),
-    attend: (id: string) => requests.post<void>(`/activities/${id}/attend`, {})
+    attend: (id: string) => requests.post<AppNotification>(`/activities/${id}/attend`, {})
 }
 
 const Account = {
@@ -125,6 +126,15 @@ const Conversations = {
     count: () => requests.get<number>('/user/Count')
 }
 
+const Notifications = {
+    list: (params: PagingParams, unRead: boolean) => axios.get<PaginatedResult<AppNotification[]>>(`/notification?unRead=${unRead}`, { params })
+        .then(responseBody),
+    markAsread: () => requests.post<void>('/notification/mark-as-read', {}),
+    removeNotification: (notificationId: string) => requests.del(`/notification/${notificationId}`),
+    readNotification: (notificationId: string) => requests.post<void>(`/notification/${notificationId}`, {}),
+    unreadNotificationsCount: () => requests.get<number>('/notification/GetUnreadNotificationsCount')
+}
+
 const Profiles = {
     get: (username: string) => requests.get<Profile>(`/profiles/${username}`),
     uploadPhoto: (file: Blob) => {
@@ -138,7 +148,7 @@ const Profiles = {
     deletePhoto: (id: string) => requests.del(`/photos/${id}`),
     //edit: (profile: Partial<Profile>) => requests.put(`/photos/`, profile)
     updateProfile: (profile: Partial<Profile>) => requests.put(`/profiles`, profile),
-    updateFollowing: (username: string) => requests.post(`/follow/${username}`, {}),
+    updateFollowing: (username: string) => requests.post<AppNotification>(`/follow/${username}`, {}),
     listFollowings: (username: string, predicate: string) =>
         requests.get<Profile[]>(`/follow/${username}?predicate=${predicate}`),
     listActivities: (username: string, predicate: string) =>
@@ -149,7 +159,8 @@ const agent = {
     Activities,
     Account,
     Profiles,
-    Conversations
+    Conversations,
+    Notifications
 }
 
 export default agent;

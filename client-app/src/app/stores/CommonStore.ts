@@ -15,7 +15,12 @@ export default class CommonStore {
     matchedUsers: Profile[] = [];
     unReadMessageCount = 0;
     showLabel = true;
+    notificationsPageOpen = false;
 
+
+    setNotificationsPageOpen = (value: boolean) => {
+        this.notificationsPageOpen = value;
+    }
     setShowLabel = (value: boolean) => {
         this.showLabel = value;
     }

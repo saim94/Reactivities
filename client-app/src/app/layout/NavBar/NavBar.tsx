@@ -1,12 +1,14 @@
 import { observer } from "mobx-react-lite";
 import { Link, NavLink } from "react-router-dom";
 import { Button, Container, Dropdown, Icon, Image, Label, Menu } from "semantic-ui-react"
-import { useStore } from "../stores/Store";
+import { useStore } from "../../stores/Store";
+import NotificationDropdown from "./NotificationDropdown";
+
 
 export default observer(function NavBar() {
 
     const { userStore: { user, logout }, commonStore: { unReadMessageCount, showLabel } } = useStore();
-
+    
     return (
         <Menu inverted fixed="top">
             <Container>
@@ -15,23 +17,13 @@ export default observer(function NavBar() {
                     Reactivities
                 </Menu.Item>
                 <Menu.Item as={NavLink} to="/activities" name="Activities" />
-                <Menu.Item as={NavLink} to="/errors" name="Errors" />
+                {import.meta.env.DEV && <Menu.Item as={NavLink} to="/errors" name="Errors" />}
                 <Menu.Item>
                     <Button as={NavLink} to="/createActivity" positive content="Create Activity" />
                 </Menu.Item>
                 <Menu.Item position='right'>
                     <Menu.Item position='right'>
-                        <Button basic icon circular style={{ marginRight: '3px' }}>
-
-                            {showLabel && unReadMessageCount !== 0 && <Label color='red' floating circular>{1}</Label>}
-                            <Dropdown icon='world' className='icon'>
-                                <Dropdown.Menu>
-                                    <Dropdown.Item>English</Dropdown.Item>
-                                    <Dropdown.Item>Russian</Dropdown.Item>
-                                    <Dropdown.Item>Spanish</Dropdown.Item>
-                                </Dropdown.Menu>
-                            </Dropdown>
-                        </Button>
+                        <NotificationDropdown />
                         <Button as={NavLink} to="/inbox" basic icon circular>
                             <Icon name='envelope' />
                             {showLabel && unReadMessageCount !== 0 && <Label color='red' floating circular>{unReadMessageCount}</Label>}

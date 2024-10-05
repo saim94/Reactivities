@@ -1,5 +1,7 @@
 ﻿using Application.Core;
 using Application.Interfaces;
+using Application.ReturnDTOs;
+using AutoMapper;
 using Domain;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -14,28 +16,32 @@ namespace Application.Followers
 {
     public class FollowToggle
     {
-        public class Command : IRequest<Result<Unit>>
+        public class Command : IRequest<Result<NotificationDto>>
         {
             public string TargetUsername { get; set; }
         }
 
-        public class Handler : IRequestHandler<Command, Result<Unit>>
+        public class Handler : IRequestHandler<Command, Result<NotificationDto>>
         {
             private readonly DataContext _context;
             private readonly IUserAccessor _userAccessor;
+            private readonly IMapper _mapper;
 
-            public Handler(DataContext context, IUserAccessor userAccessor)
+            public Handler(DataContext context, IUserAccessor userAccessor, IMapper mapper)
             {
                 _context = context;
                 _userAccessor = userAccessor;
+                _mapper = mapper;
             }
-            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<NotificationDto>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var observer = await _context.Users.FirstOrDefaultAsync(x =>
+                var observer = await _context.Users.Include(u => u.Photos).FirstOrDefaultAsync(x =>
                 x.UserName == _userAccessor.GetUsername());
 
                 var target = await _context.Users.FirstOrDefaultAsync(x =>
                 x.UserName == request.TargetUsername);
+
+                var notification = new Notification();
 
                 if (target == null) return null;
 
@@ -50,6 +56,10 @@ namespace Application.Followers
                     };
 
                     _context.UserFollowings.Add(following);
+                    notification = new Notification(" Started following You",
+                        " following ", observer.Id, "", observer);
+                    notification.UserId = target.Id;
+                    notification.User = target;
                 }
                 else
                 {
@@ -58,9 +68,11 @@ namespace Application.Followers
 
                 var success = await _context.SaveChangesAsync() > 0;
 
-                if (success) return Result<Unit>.Success(Unit.Value);
+                var notificationDto = _mapper.Map<Notification, NotificationDto>(notification);
 
-                return Result<Unit>.Failure("Failed to update following");
+                if (success) return Result<NotificationDto>.Success(notificationDto);
+
+                return Result<NotificationDto>.Failure("Failed to update following");
             }
         }
     }

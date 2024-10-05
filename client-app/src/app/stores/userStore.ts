@@ -1,5 +1,6 @@
 import { makeAutoObservable, runInAction } from "mobx";
 import agent from "../api/agent";
+import { PagingParams } from "../models/pagination";
 import { User, UserFormValues } from "../models/user";
 import { router } from "../router/Routes";
 import { store } from "./Store";
@@ -29,6 +30,8 @@ export default class UserStore {
             store.commonStore.setToken(user.token);
             this.startRefreshTokenTimer(user);
             runInAction(() => this.user = user);
+            store.notificationStore.getNotifications(new PagingParams(1, 5, store.notificationStore.newNotificationsCount), false);
+            store.notificationStore.getUnreadNotificationsCount();
             router.navigate('/activities');
             store.modalStore.closeModal();
         } catch (error) {
@@ -44,6 +47,8 @@ export default class UserStore {
             this.startRefreshTokenTimer(user);
             runInAction(() => this.user = user);
             router.navigate('/activities');
+            store.notificationStore.getNotifications(new PagingParams(1, 5, store.notificationStore.newNotificationsCount), false);
+            store.notificationStore.getUnreadNotificationsCount();
             store.modalStore.closeModal();
         } catch (error) {
             console.log(error);
@@ -66,6 +71,8 @@ export default class UserStore {
             const user = await agent.Account.current();
             store.commonStore.setToken(user.token);
             runInAction(() => this.user = user);
+            store.notificationStore.getNotifications(new PagingParams(1, 5, store.notificationStore.newNotificationsCount), false);
+            store.notificationStore.getUnreadNotificationsCount();
             this.startRefreshTokenTimer(user);
 
             let lastVisitedlocString = localStorage.getItem('lastVisitedlocation');

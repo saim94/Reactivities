@@ -34,6 +34,14 @@ namespace Application.Core
             return new PagedList<T>(items, count, pageNumber, pageSize);
         }
 
+        public static async Task<PagedList<T>> CreateAsync(IQueryable<T> source, int pageNumber,
+            int pageSize, int toSkip)
+        {
+            var count = await source.CountAsync();
+            var items = await source.Skip(((pageNumber - 1) * pageSize) + toSkip).Take(pageSize).ToListAsync();
+            return new PagedList<T>(items, count, pageNumber, pageSize);
+        }
+
         public static async Task<PagedList<TDestination>> CreateAsync<TSource, TDestination>(
             IQueryable<TSource> source, IMapper mapper, int pageNumber, int pageSize)
         {

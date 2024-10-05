@@ -1,4 +1,5 @@
 import { runInAction } from "mobx";
+import { AppNotification } from "../app/models/appNotification";
 import { Conversation } from "../app/models/conversation";
 
 export default function GetUnreadMessageCount(currentUserUserName: string, conversation: Conversation) {
@@ -9,13 +10,6 @@ export default function GetUnreadMessageCount(currentUserUserName: string, conve
 }
 
 export function GetFirstUnreadMessageId(currentUserUserName: string, conversation: Conversation) {
-
-    //const unReadMessages = conversation.messages.filter(message =>
-    //    message.sender.userName !== currentUserUserName && !message.isRead
-    //);
-    //const unReadMessages = conversation.messages.filter(message =>
-    //    message.sender.userName !== currentUserUserName && !message.isRead
-    //);
     const unReadMessages = conversation.messages.filter(message => message.sender.userName !== currentUserUserName && !message.isRead)
     return (unReadMessages.length === 0) ? 0 : unReadMessages.sort((a, b) => a.sentAt.getTime() - b.sentAt.getTime())[0].messageId;
 }
@@ -97,3 +91,12 @@ export function ArrangeConversationsByLatestMessage(conversations: Conversation[
     });
 }
 
+export function FindNotification(notifications: AppNotification[], notificationId: string) {
+    const existingConversationIndex = notifications.findIndex(noti => noti.notificationId === notificationId);
+    return (existingConversationIndex !== -1) ? notifications[existingConversationIndex] : null;
+}
+
+export function IsUnRead(notifications: AppNotification[], notificationId: string) {
+    const notification = FindNotification(notifications, notificationId);
+    return (notification) ? (notification.isRead ? false : true) : false;
+}

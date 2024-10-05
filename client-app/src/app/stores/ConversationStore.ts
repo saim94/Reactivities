@@ -425,7 +425,12 @@ export default class ConversationStore {
 
     ModifyPagination = (predicate: string) => {
         if (this.pagination) {
-            (predicate === 'add') ? this.pagination.totalItems++ : this.pagination.totalItems--;
+            /*(predicate === 'add') ? this.pagination.totalItems++ : this.pagination.totalItems--;*/
+            if (predicate === 'add') {
+                this.pagination.totalItems++;
+            } else {
+                this.pagination.totalItems--;
+            }
             const newTotalPages = Math.ceil(this.pagination.totalItems / this.pagination.itemsPerPage);
             if (newTotalPages < this.pagination.totalPages) {
                 this.pagination.totalPages = newTotalPages;

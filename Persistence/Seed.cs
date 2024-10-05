@@ -316,7 +316,7 @@ namespace Persistence
                         conversations.Add(conversation);
                     }
                 }
-                var bob = await context.Users.FindAsync("f78a4658-c6c3-4ebf-9d01-0ca51c914178");
+                var bob = await context.Users.FindAsync("0ea8a018-767d-45c8-9609-073080a6d63b");
                 for (int i = 0; i < users.Count - 1; i++)
                 {
                     var conversation = new Conversation

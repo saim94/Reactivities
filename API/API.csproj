@@ -45,6 +45,7 @@
 	  <Compile Include="Controllers\FallbackController.cs" />
 	  <Compile Include="Controllers\FollowController.cs" />
 	  <Compile Include="Controllers\MessagesController.cs" />
+	  <Compile Include="Controllers\NotificationController.cs" />
 	  <Compile Include="Controllers\PhotosController.cs" />
 	  <Compile Include="Controllers\ProfilesController.cs" />
 	  <Compile Include="Controllers\UserController.cs" />
@@ -62,6 +63,7 @@
 	  <Compile Include="Services\TokenService.cs" />
 	  <Compile Include="SignalR\ChatHub.cs" />
 	  <Compile Include="SignalR\MessageHub.cs" />
+	  <Compile Include="SignalR\NotificationHub.cs" />
 	  <Compile Include="SignalR\UserDetailProvider.cs" />
 	  <Compile Include="WeatherForecast.cs" />
 	</ItemGroup>

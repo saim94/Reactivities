@@ -136,21 +136,40 @@ export default class ProfileStore {
     updateFollowing = async (username: string, following: boolean) => {
         this.loading = true;
         try {
-            await agent.Profiles.updateFollowing(username);
+            const notification = await agent.Profiles.updateFollowing(username);
             store.activityStore.updateAttendeeFollowing(username);
             runInAction(() => {
                 if (this.profile && this.profile?.username !== store.userStore.user?.userName && this.profile.username === username) {
-                    following ? this.profile.followersCount++ : this.profile.followersCount--;
+                    //following ? this.profile.followersCount++ : this.profile.followersCount--;
+                    if (following) {
+                        this.profile.followersCount++;
+                    } else {
+                        this.profile.followersCount--;
+                    }
                     this.profile.following = !this.profile.following;
+                    if (following)
+                        store.notificationStore.followNotification(notification);
                 }
 
                 if (this.profile && this.profile.username === store.userStore.user?.userName) {
-                    following ? this.profile.followingCount++ : this.profile.followingCount--;
+                    //following ? this.profile.followingCount++ : this.profile.followingCount--;
+                    if (following) {
+                        this.profile.followingCount++;
+                    } else {
+                        this.profile.followingCount--;
+                    }
+                    if (following)
+                        store.notificationStore.followNotification(notification);
                 }
 
                 this.followings.forEach(profile => {
                     if (profile.username === username) {
-                        profile.following ? profile.followersCount-- : profile.followersCount++;
+                        //profile.following ? profile.followersCount-- : profile.followersCount++;
+                        if (profile.following) {
+                            profile.followersCount--;
+                        } else {
+                            profile.followersCount++;
+                        }
                         profile.following = !profile.following;
                     }
                 })

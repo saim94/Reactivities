@@ -1,5 +1,4 @@
 import { Container, Grid, Segment } from 'semantic-ui-react';
-import NavBar from './NavBar';
 import { observer } from 'mobx-react-lite';
 import { Outlet, ScrollRestoration, useLocation, useNavigate } from 'react-router-dom';
 import HomePage from '../../features/home/HomePage';
@@ -8,19 +7,21 @@ import { useStore } from '../stores/Store';
 import { useEffect } from 'react';
 import LoadingComponent from './LoadingComponent';
 import ModalContainer from '../common/modals/ModalContainer';
+import NavBar from './NavBar/NavBar';
 
 function App() {
 
     const location = useLocation();
     const navigate = useNavigate();
-    const { commonStore, userStore, conversationStore: { inboxOpen, setOpenInbox, hubConnection, createHubConnection, connectionCheck },
-        userStore: { isLoggedIn }
+    const { commonStore, userStore, notificationStore, conversationStore: { inboxOpen, setOpenInbox, hubConnection, createHubConnection, connectionCheck },
+        userStore: { isLoggedIn },
     } = useStore();
 
     useEffect(() => {
         if (commonStore.token) {
             userStore.getUser().finally(() => { commonStore.setAppLoaded(); })
             commonStore.getCount();
+            //notificationStore.getNotifications();
         } else {
             commonStore.setAppLoaded();
         }
@@ -60,14 +61,23 @@ function App() {
             }
         }
 
+        if (location.pathname === '/notifications') {
+            commonStore.setNotificationsPageOpen(true);
+        }
+        else {
+            commonStore.setNotificationsPageOpen(false);
+        }
+
     }, [location, inboxOpen, setOpenInbox])
 
     useEffect(() => {
         if (isLoggedIn && !hubConnection && !connectionCheck) {
             createHubConnection();
-            console.log('Hub Connection from App.tsx')
         }
 
+        if (isLoggedIn && !notificationStore.hubConnection && !notificationStore.connectionCheck) {
+            notificationStore.createHubConnection();
+        }
     }, [connectionCheck, createHubConnection, hubConnection, isLoggedIn])
 
     return (
@@ -87,7 +97,7 @@ function App() {
                             <Grid.Column width={16}>
                                 {/*<Container style={{ paddingTop: "3.5em" }}>*/}
                                 <Container>
-                                    <Segment secondary>
+                                    <Segment secondary style={{ minHeight: '88.4vh' }} >
                                         <Outlet />
                                     </Segment>
                                 </Container>

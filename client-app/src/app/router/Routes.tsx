@@ -6,6 +6,7 @@ import Inbox2 from "../../features/chat/Inbox2";
 import NotFound from "../../features/errors/NotFound";
 import ServerError from "../../features/errors/ServerError";
 import TestErrors from "../../features/errors/TestError";
+import NotificationsPage from "../../features/notifications/NotificationsPage";
 import ProfilePage from "../../features/profiles/ProfilePage";
 import App from "../layout/App";
 import RequiredAuth from "./RequiredAuth";
@@ -28,7 +29,7 @@ export const routes: RouteObject[] = [
                     /*{ path: 'chat', element: <ChatBox />, },*/
                     { path: 'errors', element: <TestErrors /> },
                     { path: '/profiles/', element: <NotFound /> },
-                    
+                    { path: 'notifications/', element: <NotificationsPage /> },
                 ]
             },
 
