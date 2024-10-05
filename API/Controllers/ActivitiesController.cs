@@ -12,6 +12,12 @@ namespace API.Controllers
 {
     public class ActivitiesController : BaseApiController
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        public ActivitiesController(IHttpContextAccessor httpContextAccessor)
+        {
+            _httpContextAccessor = httpContextAccessor;
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetActivities([FromQuery] ActivityParams param)
         {

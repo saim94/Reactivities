@@ -1,9 +1,9 @@
 import { observer } from 'mobx-react-lite'
 import { useState } from 'react'
 import { Button, Comment, Confirm } from 'semantic-ui-react';
-import format from 'date-fns/esm/format';
 import { useStore } from '../../app/stores/Store';
 import { ChatMessage } from '../../app/models/chatMessage';
+import { format } from 'date-fns';
 
 interface Props {
     message: ChatMessage;

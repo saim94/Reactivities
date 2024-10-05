@@ -3,17 +3,13 @@ using Application.Activities;
 using Application.Core;
 using Application.Interfaces;
 using AutoMapper;
-using Domain;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Infrastructure.Photos;
 using Infrastructure.Security;
-using MediatR;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
-using System.Reflection;
 
 namespace API.Extensions
 {
@@ -79,7 +75,8 @@ namespace API.Extensions
 
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<List.Query>()); // needs to tell it where handler is located ie class/path. 
                                                                                                   //typeof(List.Handler) Tells this is type of handler or this is the location of handler.
-                                                                                                  //services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+            services.AddHttpClient();
+            //services.AddAutoMapper(typeof(MappingProfiles).Assembly);
             services.AddScoped<IUserAccessor, UserAccessor>();
             services.AddScoped<ILogger<MappingProfiles>, Logger<MappingProfiles>>();
             services.AddScoped(provider => new MapperConfiguration(cfg =>

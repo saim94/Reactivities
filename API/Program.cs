@@ -78,6 +78,8 @@ app.MapHub<ChatHub>("/chat");
 
 app.MapHub<MessageHub>("/message");
 
+app.MapHub<NotificationHub>("/notification");
+
 app.MapFallbackToController("Index", "Fallback");
 
 using var scop = app.Services.CreateScope();

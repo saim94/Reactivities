@@ -17,7 +17,8 @@ namespace Domain
         public ICollection<UserFollowing> Followers { get; set; }
         public ICollection<RefreshToken> RefreshTokens { get; set; } = new List<RefreshToken>();
         public ICollection<Conversation> Conversations { get; set; }
-        public ICollection<AppUserNotification> Notifications { get; set; } = new List<AppUserNotification>();
+        //public ICollection<AppUserNotification> Notifications { get; set; } = new List<AppUserNotification>();
+        public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
 
     }
 }

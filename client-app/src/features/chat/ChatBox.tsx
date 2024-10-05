@@ -15,17 +15,24 @@ interface Props {
 export default observer(function Chatbox({ conversation }: Props) {
     const { conversationStore } = useStore();
 
+    const isProduction = process.env.NODE_ENV === 'production';
+
     const { selectedConversation, send, setSelectedConversation, getUnReadMessageCount, getfirstUnreadMessageId
         , lastUnreadMessageId, GetMessages } = conversationStore
 
     useEffect(() => {
         setSelectedConversation(conversation!);
         autorun(() => {
-            getUnReadMessageCount;
-            getfirstUnreadMessageId;
-            lastUnreadMessageId;
+            const unreadCount = getUnReadMessageCount;
+            const firstUnreadId = getfirstUnreadMessageId;
+            const lastId = lastUnreadMessageId;
+
+            // Only log if not in production
+            if (!isProduction) {
+                console.log(unreadCount, firstUnreadId, lastId);
+            }
         });
-    }, [setSelectedConversation, conversation, getUnReadMessageCount, getfirstUnreadMessageId, lastUnreadMessageId]);
+    }, [setSelectedConversation, conversation, getUnReadMessageCount, getfirstUnreadMessageId, lastUnreadMessageId, isProduction]);
 
     useEffect(() => {
         if (conversation?.conversationId) {

@@ -45,9 +45,11 @@ namespace Application.Core
                     .ForMember(d => d.FollowingCount, o => o.MapFrom(s => s.Followings.Count))
                     .ForMember(d => d.Following,
                     o => o.MapFrom(s => s.Followers.Any(x => x.Observer.UserName == currentUsername)));
+
                 CreateMap<Comment, CommentDto>()
                     .ForMember(d => d.DisplayName, o => o.MapFrom(s => s.Author.DisplayName))
                     .ForMember(d => d.Username, o => o.MapFrom(s => s.Author.UserName))
+                    .ForMember(d => d.ActivityId, o => o.MapFrom(s => s.Activity.Id))
                     .ForMember(d => d.Image, o => o.MapFrom(s => s.Author.Photos.FirstOrDefault(x => x.IsMain).Url));
 
                 CreateMap<ActivityAttendee, Profiles.UserActivityDto>()
@@ -86,6 +88,18 @@ namespace Application.Core
                     .ForMember(dest => dest.CurrentUser, opt => opt.MapFrom(src => GetCurrentUser(src, _currentUsername)))
                     .ForMember(dest => dest.OtherUser, opt => opt.MapFrom(src => GetOtherUser(src, _currentUsername)))
                     .ForMember(dest => dest.Messages, opt => opt.MapFrom(src => src.Messages));
+
+                CreateMap<Notification, NotificationDto>()
+                    .ForMember(d => d.NotificationId, opt => opt.MapFrom(src => src.NotificationId))
+                    .ForMember(d => d.Content, opt => opt.MapFrom(src => src.Content))
+                    .ForMember(d => d.CreatedDate, opt => opt.MapFrom(src => src.CreatedDate))
+                    .ForMember(d => d.Title, opt => opt.MapFrom(src => src.Title))
+                    .ForMember(d => d.IsRead, opt => opt.MapFrom(src => src.IsRead))
+                    .ForMember(d => d.UserId, opt => opt.MapFrom(src => src.UserId))
+                    .ForMember(d => d.User, opt => opt.MapFrom(src => src.User))
+                    .ForMember(d => d.SourceUserId, opt => opt.MapFrom(src => src.SourceUserId))
+                    .ForMember(d => d.SourceUser, opt => opt.MapFrom(src => src.SourceUser))
+                    .ForMember(d => d.ActivityId, opt => opt.MapFrom(src => src.ActivityId));
                 //.ForAllMembers(opt => opt.Condition((src, dest, member) =>
                 //{
                 //    _logger.LogInformation($"Mapping {src.GetType().Name}.{member} to {dest.GetType().Name}.{member}");

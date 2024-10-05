@@ -56,9 +56,13 @@ export default function ChatFooter({ username, send }: Props) {
                                         }
                                         if (e.key === 'Enter' && !e.shiftKey) {
                                             e.preventDefault();
-                                            isValid && handleSubmit();
+                                            //isValid && handleSubmit();
+                                            if (isValid) {
+                                                handleSubmit();
+                                            }
                                         }
-                                    }}
+                                    }
+                                    }
                                 />
                                 <Button
                                     style={{ marginTop: '0.5px' }}

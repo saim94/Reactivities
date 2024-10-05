@@ -2,10 +2,10 @@ import { makeAutoObservable, reaction, runInAction } from "mobx";
 import agent from "../api/agent";
 import { Activity, ActivityFormValues } from "../models/activity";
 import { v4 as uuid } from "uuid"
-import { format } from "date-fns";
 import { store } from "./Store";
 import { Profile } from "../models/profile";
 import { Pagination, PagingParams } from "../models/pagination";
+import { format } from "date-fns";
 
 export default class ActivityStore {
 
@@ -179,7 +179,7 @@ export default class ActivityStore {
         const user = store.userStore.user;
         const attendee = new Profile(user!);
         try {
-            await agent.Activities.create(activity);
+            const notification = await agent.Activities.create(activity);
             const newActivity = new Activity(activity);
             newActivity.hostUsername = user!.userName;
             newActivity.attendees = [attendee];
@@ -188,6 +188,7 @@ export default class ActivityStore {
                 //this.activities.push(activity);
                 //this.activityRegistry.set(activity.id, activity);
                 this.selectedActivity = newActivity;
+                store.notificationStore.createActivityNotification(notification);
             })
         } catch (error) {
             console.log(error)
@@ -196,12 +197,13 @@ export default class ActivityStore {
 
     updateActivity = async (activity: ActivityFormValues) => {
         try {
-            await agent.Activities.update(activity);
+            const notifications = await agent.Activities.update(activity);
             runInAction(() => {
                 if (activity.id) {
                     const updatedActivity = { ...this.getActivity(activity.id), ...activity };
                     this.activityRegistry.set(activity.id, updatedActivity as Activity);
                     this.selectedActivity = updatedActivity as Activity;
+                    store.notificationStore.updateActivityNotification(notifications, activity.id);
                 }
             })
         } catch (error) {
@@ -230,7 +232,7 @@ export default class ActivityStore {
         const user = store.userStore.user;
         this.loading = true;
         try {
-            await agent.Activities.attend(this.selectedActivity!.id)
+            const notification = await agent.Activities.attend(this.selectedActivity!.id)
             runInAction(() => {
                 if (this.selectedActivity?.isGoing) {
                     this.selectedActivity.attendees =
@@ -240,6 +242,7 @@ export default class ActivityStore {
                     const attendee = new Profile(user!);
                     this.selectedActivity?.attendees?.push(attendee);
                     this.selectedActivity!.isGoing = true;
+                    store.notificationStore.activityAttendNotification(notification);
                 }
                 this.activityRegistry.set(this.selectedActivity!.id, this.selectedActivity!);
             })
@@ -253,10 +256,11 @@ export default class ActivityStore {
     cancelActivityToggle = async () => {
         this.loading = true;
         try {
-            await agent.Activities.attend(this.selectedActivity!.id);
+            const notification = await agent.Activities.attend(this.selectedActivity!.id);
             runInAction(() => {
                 this.selectedActivity!.isCancelled = !this.selectedActivity?.isCancelled;
                 this.activityRegistry.set(this.selectedActivity!.id, this.selectedActivity!);
+                store.notificationStore.cancelScheduleNotification(notification, this.selectedActivity!.id);
             })
         } catch (error) {
             console.log(error);
@@ -273,7 +277,12 @@ export default class ActivityStore {
         this.activityRegistry.forEach(activity => {
             activity.attendees.forEach(attendee => {
                 if (attendee.username === username) {
-                    attendee.following ? attendee.followersCount-- : attendee.followersCount++;
+                    //attendee.following ? attendee.followersCount-- : attendee.followersCount++;
+                    if (attendee.following) {
+                        attendee.followersCount--;
+                    } else {
+                        attendee.followersCount++;
+                    }
                     attendee.following = !attendee.following;
                 }
             })

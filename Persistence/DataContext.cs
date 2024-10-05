@@ -19,6 +19,14 @@ namespace Persistence
         {
         }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            base.OnConfiguring(optionsBuilder);
+
+            // Enable sensitive data logging
+            //optionsBuilder.EnableSensitiveDataLogging();
+        }
+
         public DbSet<Activity> Activities { get; set; }
         public DbSet<ActivityAttendee> ActivityAttendees { get; set; }
         public DbSet<Photo> Photos { get; set; }
@@ -77,20 +85,27 @@ namespace Persistence
                 .HasForeignKey(c => c.User2_Id);
 
             builder.Entity<Message>()
-            .HasOne(m => m.Conversation)
-            .WithMany(c => c.Messages)
-            .HasForeignKey(m => m.ConversationId);
+                .HasOne(m => m.Conversation)
+                .WithMany(c => c.Messages)
+                .HasForeignKey(m => m.ConversationId);
+
+            //builder.Entity<Notification>()
+            //            .HasMany(n => n.AppUserNotifications)
+            //            .WithOne(aun => aun.Notification)
+            //            .HasForeignKey(aun => aun.NotificationId);
+
+            //builder.Entity<AppUser>()
+            //    .HasMany(u => u.Notifications)
+            //    .WithOne(aun => aun.User)
+            //    .HasForeignKey(aun => aun.UserId);
 
             builder.Entity<Notification>()
-                        .HasMany(n => n.AppUserNotifications)
-                        .WithOne(aun => aun.Notification)
-                        .HasForeignKey(aun => aun.NotificationId);
+                .HasKey(n => n.NotificationId);
 
             builder.Entity<AppUser>()
                 .HasMany(u => u.Notifications)
-                .WithOne(aun => aun.User)
-                .HasForeignKey(aun => aun.UserId);
-
+                .WithOne(u=>u.User)
+                .HasForeignKey(n => n.UserId); // Assuming UserId is the foreign key in Notification referring to AppUser
         }
 
         //public int GetNextConversationId()

@@ -35,6 +35,8 @@ export default class CommentStore {
                 runInAction(() => {
                     comment.createdAt = new Date(comment.createdAt);
                     this.comments.unshift(comment)
+                    if (comment.username === store.userStore.user?.userName)
+                        store.notificationStore.commentNotification(comment);
                 });
             })
         }

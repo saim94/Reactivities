@@ -155,10 +155,74 @@ html, body {
 }
 
 .dropDownSearch {
-    border:none !important;
-    box-shadow:none !important;
-
+    border: none !important;
+    box-shadow: none !important;
 }
+
+.custom-dropdown:hover {
+    background-color: white; /* Change background color to white on hover */
+}
+
+.meta {
+    display: flex; /* Arrange elements horizontally */
+    justify-content: space-between; /* Distribute elements evenly */
+    align-items: center; /* Align vertically */
+    color: rgba(0, 0, 0, 0.6); /* Grey text color */
+    font-size: 0.8em; /* Slightly smaller font */
+    margin-top: 0.5em; /* Add some space above the meta information */
+}
+
+    .meta span { /* Style the time text */
+        margin-right: 1em; /* Add margin between time and buttons */
+    }
+
+.customDropdonwnPadding {
+    padding: 0px 16px 5px 16px !important;
+}
+
+.rightAlignedDropdown {
+    left: 250px; /* Remove default left positioning */
+    right: 0; /* Set right position to 0 */
+}
+
+.notification-link {
+    text-decoration: none;
+    cursor: pointer;
+}
+
+    .notification-link:focus {
+        outline: none;
+    }
+
+    .notification-link:hover {
+        text-decoration: none;
+    }
+
+    .notification-link:active {
+        text-decoration: none;
+    }
+
+    .notification-link:focus,
+    .notification-link:hover {
+        color: gray; /* Change color to desired color */
+        background-color: #f0f0f0; /*Change background color to desired color */
+        border: 1px solid #ccc; /*Add border for button-like appearance */
+        border-radius: 3px; /*Add border radius for button-like appearance */
+        padding: 4px 8px; /*Add padding for button-like appearance */
+    }
+
+/* Hide the dropdown by default */
+.notification-dropdown {
+    display: none;
+}
+
+/* Show the dropdown only when the specific notification segment is hovered */
+.notification-segment:hover .notification-dropdown {
+    display: block;
+}
+
+
+
 /*.comment-group-width {
     width: 100% !important;
 }*/
