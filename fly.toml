@@ -1,13 +1,13 @@
-# fly.toml app configuration file generated for reactivities-pk on 2023-05-13T16:58:52+05:00
+# fly.toml app configuration file generated for reactivities-pk on 2024-10-06T06:40:09+05:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
-app = "reactivities-pk"
-primary_region = "sin"
+app = 'reactivities-pk'
+primary_region = 'syd'
 
 [build]
-  image = "saimsajid94/reactivities:latest"
+  image = 'saimsajid94/reactivities:latest'
 
 [env]
   ASPNETCORE_URLS = "http://+:8080"
@@ -18,5 +18,10 @@ primary_region = "sin"
 [http_service]
   internal_port = 8080
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = 'stop'
   auto_start_machines = true
+  min_machines_running = 0
+  processes = ['app']
+
+[[vm]]
+  size = 'shared-cpu-1x'
