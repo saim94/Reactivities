@@ -1,7 +1,9 @@
 ﻿using Domain;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System.Net.Http;
 
 namespace Persistence
 {
@@ -258,11 +260,11 @@ namespace Persistence
             }
         }
 
-        public static async Task SeedData2(DataContext context, UserManager<AppUser> userManager)
+        public static async Task SeedData2(DataContext context, UserManager<AppUser> userManager, HttpClient httpClient)
         {
-            if (userManager.Users.Count() < 20)
-            {
-                var users = new List<AppUser>
+            //if (userManager.Users.Count() < 20)
+            //{
+            var users = new List<AppUser>
                 {
                     new AppUser { DisplayName = "Bob Johnson", UserName = "bob@example.com", Email = "bob@example.com" },
                     new AppUser { DisplayName = "Jane Smith", UserName = "jane@example.com", Email = "jane@example.com" },
@@ -286,23 +288,23 @@ namespace Persistence
                     new AppUser { DisplayName = "Sam Turner", UserName = "sam@example.com", Email = "sam@example.com" }
                 };
 
-                foreach (var user in users)
-                {
-                    await userManager.CreateAsync(user, "Pa$$w0rd");
-                }
+            //foreach (var user in users)
+            //{
+            //    await userManager.CreateAsync(user, "Pa$$w0rd");
+            //}
 
-                var conversations = new List<Conversation>();
+            var conversations = new List<Conversation>();
 
-                // Create conversations between all users
-                for (int i = 0; i < users.Count - 1; i++)
+            // Create conversations between all users
+            for (int i = 0; i < users.Count - 1; i++)
+            {
+                for (int j = i + 1; j < users.Count; j++)
                 {
-                    for (int j = i + 1; j < users.Count; j++)
+                    var conversation = new Conversation
                     {
-                        var conversation = new Conversation
-                        {
-                            User1 = users[i],
-                            User2 = users[j],
-                            Messages = new List<Message>
+                        User1 = users[i],
+                        User2 = users[j],
+                        Messages = new List<Message>
                         {
                             new Message { Sender = users[i], Content = $"Hello {users[j].DisplayName}!", SentAt = DateTime.UtcNow },
                             new Message { Sender = users[j], Content = $"Hi {users[i].DisplayName}!", SentAt = DateTime.UtcNow.AddMinutes(1) },
@@ -311,12 +313,16 @@ namespace Persistence
                             // Add more messages as needed
                             // ...
                         }
-                        };
+                    };
 
-                        conversations.Add(conversation);
-                    }
+                    conversations.Add(conversation);
                 }
-                var bob = await context.Users.FindAsync("0ea8a018-767d-45c8-9609-073080a6d63b");
+            }
+            var bob = await context.Users.Include(c => c.Conversations).FirstOrDefaultAsync(x => x.Id == "a9c9a225-6b82-4129-92cb-23e274c4e554");
+
+
+            if (bob.Conversations.Count < 20)
+            {
                 for (int i = 0; i < users.Count - 1; i++)
                 {
                     var conversation = new Conversation
@@ -345,7 +351,13 @@ namespace Persistence
 
                 //await context.Activities.AddRangeAsync(activities);
                 await context.SaveChangesAsync();
+
+                var response = await httpClient.GetAsync("https://reactivities-pk.fly.dev/api/WeatherForecast");
+
             }
+
+
+            //}
         }
 
     }
