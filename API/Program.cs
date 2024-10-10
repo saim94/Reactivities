@@ -89,9 +89,8 @@ try
 {
     var context = service.GetRequiredService<DataContext>();
     var userManager = service.GetRequiredService<UserManager<AppUser>>();
-    var httpClient = service.GetRequiredService<HttpClient>();
     await context.Database.MigrateAsync();
-    await Seed.SeedData2(context, userManager, httpClient);
+    //await Seed.SeedData2(context, userManager);
 }
 catch (Exception ex)
 {
