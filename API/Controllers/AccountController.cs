@@ -17,15 +17,13 @@ namespace API.Controllers
         private readonly UserManager<AppUser> _userManager;
         private readonly TokenService _tokenService;
         private readonly IConfiguration _config;
-        private readonly WeatherForecastController _weatherForecastController;
         private readonly HttpClient _httpClient;
 
-        public AccountController(UserManager<AppUser> userManager, TokenService tokenService, IConfiguration config, WeatherForecastController weatherForecastController)
+        public AccountController(UserManager<AppUser> userManager, TokenService tokenService, IConfiguration config)
         {
             _userManager = userManager;
             _tokenService = tokenService;
             _config = config;
-            _weatherForecastController = weatherForecastController;
             _httpClient = new HttpClient
             {
                 BaseAddress = new System.Uri("https://graph.facebook.com")
@@ -38,7 +36,6 @@ namespace API.Controllers
         {
             var user = await _userManager.Users.Include(p => p.Photos)
                 .FirstOrDefaultAsync(x => (x.Email == loginDto.Email) || (x.UserName == loginDto.Email));
-            await _weatherForecastController.Get();
             if (user == null) return Unauthorized();
 
             var result = await _userManager.CheckPasswordAsync(user, loginDto.Password);

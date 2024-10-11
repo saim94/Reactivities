@@ -80,7 +80,7 @@ namespace API.Extensions
             //services.AddAutoMapper(typeof(MappingProfiles).Assembly);
             services.AddScoped<IUserAccessor, UserAccessor>();
             services.AddScoped<ILogger<MappingProfiles>, Logger<MappingProfiles>>();
-            services.AddScoped<WeatherForecastController>();
+            //services.AddScoped<WeatherForecastController>();
             services.AddScoped(provider => new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile(new MappingProfiles(provider.GetService<IUserAccessor>(), provider.GetService<ILogger<MappingProfiles>>()));
