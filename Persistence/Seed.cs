@@ -1,6 +1,7 @@
 ﻿using Domain;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace Persistence
@@ -260,6 +261,8 @@ namespace Persistence
 
         public static async Task SeedData2(DataContext context, UserManager<AppUser> userManager)
         {
+            await SeedData(context, userManager);
+
             if (userManager.Users.Count() < 20)
             {
                 var users = new List<AppUser>
@@ -316,7 +319,7 @@ namespace Persistence
                         conversations.Add(conversation);
                     }
                 }
-                var bob = await context.Users.FindAsync("0ea8a018-767d-45c8-9609-073080a6d63b");
+                var bob = await context.Users.FirstOrDefaultAsync(x => x.Email == "bob@test.com");
                 for (int i = 0; i < users.Count - 1; i++)
                 {
                     var conversation = new Conversation
@@ -336,15 +339,8 @@ namespace Persistence
                 }
 
                 await context.Conversations.AddRangeAsync(conversations);
-
-                //var activities = new List<Activity>
-                //{
-                //    // Add your existing activities
-                //    // ...
-                //};
-
-                //await context.Activities.AddRangeAsync(activities);
                 await context.SaveChangesAsync();
+
             }
         }
 

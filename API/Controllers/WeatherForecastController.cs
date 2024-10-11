@@ -48,9 +48,10 @@ public class WeatherForecastController : ControllerBase
     [HttpGet(Name = "GetWeatherForecast")]
     public async Task<IActionResult> Get()
     {
-        var userNamesText = "jane@example.com, tom@example.com, alice@example.com, charlie@example.com, david@example.com, emily@example.com, frank@example.com, grace@example.com, henry@example.com, ivy@example.com, jack@example.com, katie@example.com, luke@example.com, nora@example.com, oscar@example.com, penny@example.com, quincy@example.com, ruby@example.com, sam@example.com, bob, jane, tom, bob@example.com";
+        var userNames = _userManager.Users.Select(u => u.UserName).ToList();
+        //var userNamesText = "jane@example.com, tom@example.com, alice@example.com, charlie@example.com, david@example.com, emily@example.com, frank@example.com, grace@example.com, henry@example.com, ivy@example.com, jack@example.com, katie@example.com, luke@example.com, nora@example.com, oscar@example.com, penny@example.com, quincy@example.com, ruby@example.com, sam@example.com, bob, jane, tom, bob@example.com";
 
-        var userNames = userNamesText.Split(",").ToList();
+        //var userNames = userNamesText.Split(",").ToList();
 
         for (int i = 0; i < userNames.Count; i++)
         {
