@@ -4,6 +4,7 @@ using API.SignalR;
 using Application.Activities;
 using Application.Core;
 using Domain;
+using Infrastructure;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -14,7 +15,7 @@ using Persistence;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-// Add any services in this section
+// Add any services in this var app = builder.Build();
 builder.Services.AddControllers(opt =>
 {
     var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
@@ -25,6 +26,7 @@ builder.Services.AddControllers(opt =>
 builder.Services.AddApplicationServices(builder.Configuration);
 builder.Services.AddIdentityServices(builder.Configuration);
 
+//FirebaseService.InitializeFirebase();
 
 var app = builder.Build(); //Build the APP
 
@@ -90,7 +92,7 @@ try
     var context = service.GetRequiredService<DataContext>();
     var userManager = service.GetRequiredService<UserManager<AppUser>>();
     await context.Database.MigrateAsync();
-    await Seed.SeedData2(context, userManager);
+    //await Seed.SeedData2(context, userManager);
 }
 catch (Exception ex)
 {

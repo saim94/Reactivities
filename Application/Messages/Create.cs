@@ -59,6 +59,7 @@ namespace Application.Messages
                     .FirstOrDefaultAsync(x => x.UserName == request.RecipientUserName);
 
                 if (sender == null) return null;
+                if (recipient == null) return null;
 
                 var conversationSender = sender.Conversations.FirstOrDefault(x => x.User1_Id == recipient.Id || x.User2_Id == recipient.Id);
                 var conversationRecipient = recipient.Conversations.FirstOrDefault(x => x.User1_Id == sender.Id || x.User2_Id == sender.Id);

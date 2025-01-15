@@ -17,6 +17,6 @@ namespace Application.ReturnDTOs
         public int ConversationId { get; set; }
         public virtual ConversationDto Conversation { get; set; }
         public bool User1Deleted { get; set; }
-        public bool User2Deleted { get; set;}
+        public bool User2Deleted { get; set; }
     }
 }

@@ -72,8 +72,15 @@ export default observer(function NotificationDropdown() {
             scrolling
             className='notificationDropdown'
         >
-            <Dropdown.Menu style={{ overflowY: "auto", maxHeight: "600px" }} onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => handleClickDropdownMenu(e)}>
-                <Dropdown.Header><Header size='large'>Notifications </Header><span style={{ position: 'fixed', right: '30px', top: '5px', cursor: 'pointer', fontWeight: 'bold' }}> <NotificationDropdownHeaderOptions /> </span></Dropdown.Header>
+            <Dropdown.Menu style={{ overflowY: "auto", maxHeight: "600px", minWidth: '250px !important' }} onClick={(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => handleClickDropdownMenu(e)}>
+                <Dropdown.Header>
+                    <Header size='large'>Notifications</Header>
+                    {notifications && notifications.length > 0 && (
+                        <span style={{ position: 'fixed', right: '30px', top: '5px', cursor: 'pointer', fontWeight: 'bold' }}>
+                            <NotificationDropdownHeaderOptions />
+                        </span>
+                    )}
+                </Dropdown.Header>
                 {loadingInitial ? (
                     <>
                         <DropdownNotificationsPlaceholder />

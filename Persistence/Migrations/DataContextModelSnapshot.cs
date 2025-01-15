@@ -200,6 +200,36 @@ namespace Persistence.Migrations
                     b.ToTable("Conversations");
                 });
 
+            modelBuilder.Entity("Domain.EmailAddress", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Email")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_EmailAddresses_UserId_IsPrimary")
+                        .HasFilter("IsPrimary = TRUE");
+
+                    b.ToTable("EmailAddresses");
+                });
+
             modelBuilder.Entity("Domain.Message", b =>
                 {
                     b.Property<int>("MessageId")
@@ -277,6 +307,36 @@ namespace Persistence.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("Domain.PhoneNumber", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsPrimary")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsVerified")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Number")
+                        .HasColumnType("text");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasDatabaseName("IX_PhoneNumbers_UserId_IsPrimary")
+                        .HasFilter("IsPrimary = TRUE");
+
+                    b.ToTable("PhoneNumbers");
                 });
 
             modelBuilder.Entity("Domain.Photo", b =>
@@ -524,6 +584,15 @@ namespace Persistence.Migrations
                     b.Navigation("User2");
                 });
 
+            modelBuilder.Entity("Domain.EmailAddress", b =>
+                {
+                    b.HasOne("Domain.AppUser", "User")
+                        .WithMany("EmailAddresses")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Domain.Message", b =>
                 {
                     b.HasOne("Domain.Conversation", "Conversation")
@@ -552,6 +621,15 @@ namespace Persistence.Migrations
                         .HasForeignKey("UserId");
 
                     b.Navigation("SourceUser");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Domain.PhoneNumber", b =>
+                {
+                    b.HasOne("Domain.AppUser", "User")
+                        .WithMany("PhoneNumbers")
+                        .HasForeignKey("UserId");
 
                     b.Navigation("User");
                 });
@@ -655,11 +733,15 @@ namespace Persistence.Migrations
 
                     b.Navigation("Conversations");
 
+                    b.Navigation("EmailAddresses");
+
                     b.Navigation("Followers");
 
                     b.Navigation("Followings");
 
                     b.Navigation("Notifications");
+
+                    b.Navigation("PhoneNumbers");
 
                     b.Navigation("Photos");
 

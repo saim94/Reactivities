@@ -6,6 +6,7 @@ using Application.Interfaces;
 using AutoMapper;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Infrastructure.Email;
 using Infrastructure.Photos;
 using Infrastructure.Security;
 using Microsoft.AspNetCore.SignalR;
@@ -61,26 +62,26 @@ namespace API.Extensions
 
 
             services.AddCors(opt =>
-                        {
-                            opt.AddPolicy("CorsPolicy", policy =>
-                            {
-                                policy
-                                .AllowAnyMethod()
-                                .AllowAnyHeader()
-                                .AllowCredentials()
-                                .WithExposedHeaders("WWW-Authenticate", "Pagination")
-                                .WithOrigins("http://localhost:3000", "https://localhost:3000");
-                            }
-                            );
-                        });
+            {
+                opt.AddPolicy("CorsPolicy", policy =>
+                {
+                    policy
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials()
+                    .WithExposedHeaders("WWW-Authenticate", "Pagination")
+                    .WithOrigins("http://localhost:3000", "https://localhost:3000", "http://127.0.0.1:3000", "https://127.0.0.1:3000", "http://127.0.0.1:3001", "https://127.0.0.1:3001");
+                }
+                );
+            });
 
             services.AddMediatR(cfg => cfg.RegisterServicesFromAssemblyContaining<List.Query>()); // needs to tell it where handler is located ie class/path. 
                                                                                                   //typeof(List.Handler) Tells this is type of handler or this is the location of handler.
             services.AddHttpClient();
-            //services.AddAutoMapper(typeof(MappingProfiles).Assembly);
+            services.AddAutoMapper(typeof(MappingProfiles).Assembly);
             services.AddScoped<IUserAccessor, UserAccessor>();
             services.AddScoped<ILogger<MappingProfiles>, Logger<MappingProfiles>>();
-            services.AddScoped<WeatherForecastController>();
+            //services.AddScoped<WeatherForecastController>();
             services.AddScoped(provider => new MapperConfiguration(cfg =>
             {
                 cfg.AddProfile(new MappingProfiles(provider.GetService<IUserAccessor>(), provider.GetService<ILogger<MappingProfiles>>()));
@@ -91,6 +92,9 @@ namespace API.Extensions
             services.AddHttpContextAccessor();
             //services.AddScoped<IUserAccessor, UserAccessor>();
             services.AddScoped<IPhotoAccessor, PhotoAccessor>();
+            services.AddScoped<EmailSender>();
+            services.AddScoped<CodeValidation>();
+            services.AddSingleton<Encryption>();
             services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
             services.AddSignalR(o =>
             {

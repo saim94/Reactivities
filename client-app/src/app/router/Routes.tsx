@@ -8,6 +8,9 @@ import ServerError from "../../features/errors/ServerError";
 import TestErrors from "../../features/errors/TestError";
 import NotificationsPage from "../../features/notifications/NotificationsPage";
 import ProfilePage from "../../features/profiles/ProfilePage";
+import ConfirmEmail from "../../features/users/ConfirmEmail";
+import PasswordReset from "../../features/users/PasswordReset";
+import RegisterSuccess from "../../features/users/RegisterSuccess";
 import App from "../layout/App";
 import RequiredAuth from "./RequiredAuth";
 
@@ -35,6 +38,9 @@ export const routes: RouteObject[] = [
 
             { path: 'not-found', element: <NotFound /> },
             { path: 'server-error', element: <ServerError /> },
+            { path: 'account/registerSuccess', element: <RegisterSuccess /> },
+            { path: 'emails/verifyEmail', element: <ConfirmEmail /> },
+            { path: 'account/passwordReset', element: <PasswordReset /> },
             { path: '*', element: <Navigate replace to='not-found' /> }
         ]
     }

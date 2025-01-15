@@ -19,6 +19,7 @@ export default observer(function ChatCard({ conversation, send }: Props) {
     const otherUser = conversation.otherUser;
     const messages = conversation.messages.slice().sort((a, b) => a.sentAt.getTime() - b.sentAt.getTime());
     const message = messages[messages.length - 1];
+
     return (
         <Card raised>
             <Card.Content>

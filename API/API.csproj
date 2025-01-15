@@ -42,29 +42,37 @@
 	  <Compile Include="Controllers\BaseApiController.cs" />
 	  <Compile Include="Controllers\BuggyController.cs" />
 	  <Compile Include="Controllers\ConversationsController.cs" />
+	  <Compile Include="Controllers\EmailActionsController.cs" />
+	  <Compile Include="Controllers\EmailsController.cs" />
 	  <Compile Include="Controllers\FallbackController.cs" />
 	  <Compile Include="Controllers\FollowController.cs" />
 	  <Compile Include="Controllers\MessagesController.cs" />
 	  <Compile Include="Controllers\NotificationController.cs" />
+	  <Compile Include="Controllers\PhonesController.cs" />
 	  <Compile Include="Controllers\PhotosController.cs" />
 	  <Compile Include="Controllers\ProfilesController.cs" />
+	  <Compile Include="Controllers\FirebaseController.cs" />
 	  <Compile Include="Controllers\UserController.cs" />
 	  <Compile Include="Controllers\WeatherForecastController.cs" />
 	  <Compile Include="DTOs\FacebookDto.cs" />
 	  <Compile Include="DTOs\LoginDto.cs" />
 	  <Compile Include="DTOs\MessageDto.cs" />
+	  <Compile Include="DTOs\PasswordUpdateDto.cs" />
 	  <Compile Include="DTOs\RegisterDto.cs" />
 	  <Compile Include="DTOs\UserDto.cs" />
 	  <Compile Include="Extensions\ApplicationServiceExtension.cs" />
 	  <Compile Include="Extensions\HttpExtensions.cs" />
 	  <Compile Include="Extensions\IdentityServiceExtension.cs" />
+	  <Compile Include="Manager\CustomUserManager.cs" />
 	  <Compile Include="Middleware\ExceptionMiddleware.cs" />
 	  <Compile Include="Program.cs" />
+	  <Compile Include="Services\ManagerService.cs" />
 	  <Compile Include="Services\TokenService.cs" />
 	  <Compile Include="SignalR\ChatHub.cs" />
 	  <Compile Include="SignalR\MessageHub.cs" />
 	  <Compile Include="SignalR\NotificationHub.cs" />
 	  <Compile Include="SignalR\UserDetailProvider.cs" />
+	  <Compile Include="Store\CustomUserStore.cs" />
 	  <Compile Include="WeatherForecast.cs" />
 	</ItemGroup>
 
@@ -100,6 +108,12 @@
 	<ItemGroup>
 		<ProjectReference Include="..\Application\Application.csproj" />
 		<ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Update="appsettings.Development.json">
+	    <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+	  </Content>
 	</ItemGroup>
 
 </Project>
