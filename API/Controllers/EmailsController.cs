@@ -49,7 +49,7 @@ namespace API.Controllers
 
         [AllowAnonymous]
         [HttpPost("VerifyEmail")]
-        public async Task<IActionResult> VerifyEmail(Verify.Command command)
+        public async Task<IActionResult> VerifyEmail([FromQuery] Verify.Command command)
         {
             return HandleResult(await Mediator.Send(command));
         }
