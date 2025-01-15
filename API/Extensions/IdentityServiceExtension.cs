@@ -1,9 +1,13 @@
-﻿using API.Services;
+﻿using API.Manager;
+using API.Services;
 using API.SignalR;
+using API.Store;
+using Application.Interfaces;
 using Domain;
 using Infrastructure.Security;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.IdentityModel.Tokens;
 using Persistence;
@@ -19,9 +23,14 @@ namespace API.Extensions
             services.AddIdentityCore<AppUser>(opt =>
             {
                 opt.Password.RequireNonAlphanumeric = false;
-                opt.User.RequireUniqueEmail = true;
+                //opt.User.RequireUniqueEmail = true;
+                opt.SignIn.RequireConfirmedEmail = true;
             })
-                .AddEntityFrameworkStores<DataContext>();
+                .AddUserManager<CustomUserManager>()
+                .AddUserStore<CustomUserStore>()
+                .AddEntityFrameworkStores<DataContext>()
+                .AddSignInManager<SignInManager<AppUser>>()
+                .AddDefaultTokenProviders();
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["TokenKey"]));
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -45,7 +54,7 @@ namespace API.Extensions
                         {
                             var accessToken = context.Request.Query["access_token"];
                             var path = context.HttpContext.Request.Path;
-                            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chat") || path.StartsWithSegments("/message")|| path.StartsWithSegments("/notification"))
+                            if (!string.IsNullOrEmpty(accessToken) && path.StartsWithSegments("/chat") || path.StartsWithSegments("/message") || path.StartsWithSegments("/notification"))
                             {
                                 context.Token = accessToken;
                             }
@@ -61,10 +70,11 @@ namespace API.Extensions
                     policy.Requirements.Add(new IsHostRequirement());
                 });
             });
-
+            services.AddScoped<CustomUserStore>();
+            services.AddScoped<CustomUserManager>();
+            services.AddScoped<IUserManager, ManagerService>();
             services.AddTransient<IAuthorizationHandler, IHostRequirementHandler>();
             services.AddScoped<TokenService>();
-
             return services;
         }
     }

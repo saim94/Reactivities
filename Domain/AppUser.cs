@@ -19,6 +19,8 @@ namespace Domain
         public ICollection<Conversation> Conversations { get; set; }
         //public ICollection<AppUserNotification> Notifications { get; set; } = new List<AppUserNotification>();
         public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
+        public ICollection<EmailAddress> EmailAddresses { get; set; } = new List<EmailAddress>();
+        public ICollection<PhoneNumber> PhoneNumbers { get; set; } = new List<PhoneNumber>();
 
     }
 }

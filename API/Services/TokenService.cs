@@ -15,13 +15,13 @@ namespace API.Services
         {
             _config = config;
         }
-        public string CreateToken(AppUser user)
+        public string CreateToken(AppUser user, string email)
         {
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
-                new Claim(ClaimTypes.Email, user.Email)
+                new Claim(ClaimTypes.Email, email)
             };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["TokenKey"]));
@@ -46,6 +46,24 @@ namespace API.Services
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomNumber);
             return new RefreshToken { Token = Convert.ToBase64String(randomNumber) };
+        }
+
+        public string GenerateNumericCode(int length = 6)
+        {
+            var random = new Random();
+            return new string(Enumerable.Repeat("0123456789", length)
+                                        .Select(s => s[random.Next(s.Length)]).ToArray());
+        }
+
+        public string GenerateCode(int length = 6)
+        {
+            var random = new Random();
+            var code = new char[length];
+            for (int i = 0; i < length; i++)
+            {
+                code[i] = (char)('0' + random.Next(0, 10));
+            }
+            return new string(code);
         }
     }
 }

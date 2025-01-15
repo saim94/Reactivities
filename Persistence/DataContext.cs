@@ -35,6 +35,8 @@ namespace Persistence
         public DbSet<Message> Messages { get; set; }
         public DbSet<Conversation> Conversations { get; set; }
         public DbSet<Notification> Notifications { get; set; }
+        public DbSet<EmailAddress> EmailAddresses { get; set; }
+        public DbSet<PhoneNumber> PhoneNumbers { get; set; }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
@@ -71,9 +73,6 @@ namespace Persistence
                 .OnDelete(DeleteBehavior.Cascade);
             });
 
-            //builder.Entity<Conversation>()
-            //    .HasKey(k => new { k.User1_Id, k.User2_Id });
-
             builder.Entity<Conversation>()
                 .HasOne(c => c.User1)
                 .WithMany(u => u.Conversations)
@@ -89,49 +88,43 @@ namespace Persistence
                 .WithMany(c => c.Messages)
                 .HasForeignKey(m => m.ConversationId);
 
-            //builder.Entity<Notification>()
-            //            .HasMany(n => n.AppUserNotifications)
-            //            .WithOne(aun => aun.Notification)
-            //            .HasForeignKey(aun => aun.NotificationId);
-
-            //builder.Entity<AppUser>()
-            //    .HasMany(u => u.Notifications)
-            //    .WithOne(aun => aun.User)
-            //    .HasForeignKey(aun => aun.UserId);
-
             builder.Entity<Notification>()
                 .HasKey(n => n.NotificationId);
 
             builder.Entity<AppUser>()
                 .HasMany(u => u.Notifications)
-                .WithOne(u=>u.User)
-                .HasForeignKey(n => n.UserId); // Assuming UserId is the foreign key in Notification referring to AppUser
+                .WithOne(u => u.User)
+                .HasForeignKey(n => n.UserId);
+
+            builder.Entity<EmailAddress>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.HasIndex(e => new { e.UserId })
+                      .IsUnique()
+                      .HasDatabaseName("IX_EmailAddresses_UserId_IsPrimary")
+                      .HasFilter("IsPrimary = TRUE"); 
+            });
+
+            builder.Entity<PhoneNumber>(entity =>
+            {
+                entity.HasKey(p => p.Id);
+
+                entity.HasIndex(p => new { p.UserId })
+                      .IsUnique()
+                      .HasDatabaseName("IX_PhoneNumbers_UserId_IsPrimary")
+                      .HasFilter("IsPrimary = TRUE"); 
+            });
+
+            builder.Entity<AppUser>()
+                .HasMany(u => u.EmailAddresses)
+                .WithOne(u => u.User)
+                .HasForeignKey(n => n.UserId);
+
+            builder.Entity<AppUser>()
+                .HasMany(u => u.PhoneNumbers)
+                .WithOne(u => u.User)
+                .HasForeignKey(n => n.UserId);
         }
-
-        //public int GetNextConversationId()
-        //{
-        //    using (var command = Database.GetDbConnection().CreateCommand())
-        //    {
-        //        command.CommandText = "SELECT nextval('\"Conversations_ConversationId_seq\"')";
-        //        Database.OpenConnection();
-        //        using (var result = command.ExecuteReader())
-        //        {
-        //            if (result.Read() && result[0] != DBNull.Value)
-        //            {
-        //                // Value obtained by nextval
-        //                var nextValue = Convert.ToInt32(result[0]);
-
-        //                // If you are using transactions, commit the transaction here
-        //                // Database.CurrentTransaction.Commit();
-
-        //                return nextValue;
-        //            }
-        //        }
-        //    }
-
-
-        //    // Handle the case where the sequence retrieval fails.
-        //    throw new InvalidOperationException("Unable to retrieve the next value from the sequence.");
-        //}
     }
 }

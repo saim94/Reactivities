@@ -76,6 +76,24 @@ export default class CommonStore {
         this.setUnReadMessageCount(count);
     }
 
+    getFirebaseConfig = async () => {
+        try {
+            const firebaseConfig = await agent.Firebase.config();
+            return {
+                apiKey: firebaseConfig.apiKey,
+                authDomain: firebaseConfig.authDomain,
+                projectId: firebaseConfig.projectId,
+                storageBucket: firebaseConfig.storageBucket,
+                messagingSenderId: firebaseConfig.messagingSenderId,
+                appId: firebaseConfig.appId,
+            };
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+    };
+
+
     //manageGroups = (connectionId: string, conversationId: number) => {
     //    debugger;
     //    var group = this.groups.find(x => x.conversationId === conversationId);

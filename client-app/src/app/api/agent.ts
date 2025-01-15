@@ -1,12 +1,14 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
 import { toast } from 'react-toastify';
+import { FirebaseConfig } from '../firebase/firebaseConfig';
 import { Activity, ActivityFormValues } from '../models/activity';
 import { AppNotification } from '../models/appNotification';
 import { ChatMessage } from '../models/chatMessage';
 import { Conversation } from '../models/conversation';
 import { PaginatedResult, PagingParams } from '../models/pagination';
+import { PasswordUpdateValues } from '../models/passwordUpdate';
 import { Photo, Profile, UserActivity } from '../models/profile';
-import { User, UserFormValues } from '../models/user';
+import { Email, Phone, User, UserFormValues } from '../models/user';
 import { router } from '../router/Routes';
 import { store } from '../stores/Store';
 
@@ -36,7 +38,7 @@ axios.interceptors.response.use(async response => {
     return response;
 
 }, (error: AxiosError) => {
-    //debugger
+
     const { data, status, config, headers } = error.response as AxiosResponse;
     switch (status) {
         case 400:
@@ -95,6 +97,7 @@ const requests = {
     get: <T>(url: string) => axios.get<T>(url).then(responseBody),
     post: <T>(url: string, body: object) => axios.post<T>(url, body).then(responseBody),
     put: <T>(url: string, body: object) => axios.put<T>(url, body).then(responseBody),
+    del1: <T>(url: string, body: object) => axios.delete<T>(url, body).then(responseBody),
     del: <T>(url: string) => axios.delete<T>(url).then(responseBody),
 }
 
@@ -113,7 +116,35 @@ const Account = {
     login: (user: UserFormValues) => requests.post<User>('/account/login', user),
     register: (user: UserFormValues) => requests.post<User>('/account/register', user),
     fbLogin: (accessToken: string) => requests.post<User>(`/account/fbLogin?accessToken=${accessToken}`, {}),
-    refreshToken: () => requests.post<User>("/account/refreshToken", {})
+    refreshToken: () => requests.post<User>("/account/refreshToken", {}),
+    resetPassword: (creds: PasswordUpdateValues) => requests.post<void>(`/account/resetPassword`, creds),
+    changePassword: (creds: PasswordUpdateValues) => requests.post<void>(`/account/changePassword`, creds),
+    codeVerification: (email: string, code: string) => requests.post(`/account/codeVerification?email=${email}&code=${code}`, {})
+}
+
+const Emails = {
+    getUserEmails: () => requests.get<Email[]>('/emails/'),
+    verifyEmail: (email: string, token: string) => requests.post<void>(`/emails/verifyEmail?token=${token}&email=${email}`, {}),
+    resendEmailConfirm: (email: string) => requests.get(`/emailActions/resendEmailConfirmationLink?email=${email}`),
+    sendPasswordResetLink: (email: string) => requests.get(`/emailActions/sendPasswordResetLink?email=${email}`),
+    sendVerificationCode: (email: string) => requests.post('/emailActions/sendVerificationCode', { email }),
+    addEmail: (email: string) => requests.post<Email>('/emails/', { email }),
+    deleteEmail: (emailId: number) => requests.del<void>(`/emails/${emailId}`),
+    setPrimary: (emailId: number) => requests.post<void>('/emails/setPrimary', { emailId }),
+    setVerification: (emailId: number) => requests.post<void>('/emails/setVerification', { emailId }),
+}
+
+const Phones = {
+    getUserPhones: () => requests.get<Phone[]>('/phones/'),
+    addPhone: (phoneNumber: string) => requests.post<Phone>('/phones/', { phoneNumber }),
+    deletePhone: (phoneNumberId: number) => requests.del<void>(`/phones/${phoneNumberId}`),
+    setPrimary: (phoneNumberId: number) => requests.post<void>('/phones/setPrimary', { phoneNumberId }),
+    setVerification: (phoneNumberId: number) => requests.post<void>('/phones/setVerification', { phoneNumberId }),
+    sendVerificationCode: (phoneNumber: string) => requests.post<void>('/phones/sendVerificationCode', { phoneNumber })
+}
+
+const Firebase = {
+    config: () => requests.get<FirebaseConfig>('/firebase/getFirebaseConfig')
 }
 
 const Conversations = {
@@ -160,7 +191,10 @@ const agent = {
     Account,
     Profiles,
     Conversations,
-    Notifications
+    Notifications,
+    Emails,
+    Phones,
+    Firebase
 }
 
 export default agent;

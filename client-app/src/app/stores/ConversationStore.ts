@@ -332,8 +332,7 @@ export default class ConversationStore {
     };
 
     send = async (messageData: MessageData) => {
-        
-        messageData.recipientUserName = (this.selectedConversation?.otherUser.userName) ? this.selectedConversation?.otherUser.userName : '';
+        //messageData.recipientUserName = (this.selectedConversation?.otherUser.userName) ? this.selectedConversation?.otherUser.userName : '';
         if (!this.connectionCheck)
             await this.createHubConnection();
         runInAction(() => {
@@ -401,7 +400,8 @@ export default class ConversationStore {
     }
 
     CreateConversation = (message: ChatMessage, loggendInUser: User) => {
-        const current_User: User = { ...loggendInUser };
+        //const current_User: User = { ...loggendInUser };
+        const current_User: User = new User(loggendInUser);
 
         const existingconversation = FindConversation(this.conversations, message.conversationId);//find is conversation already exists
 

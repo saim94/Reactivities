@@ -1,0 +1,17 @@
+.react-tel-input .flag-dropdown {
+    margin-right: 10px !important; /* Add spacing between flag and input */
+}
+
+.react-tel-input .form-control {
+    padding-left: 50px !important; /* Ensure space for flag and country code */
+}
+
+/*.react-tel-input .flag {
+    margin-top: 0 !important;*/ /* Align flag vertically */
+    /*display: inline-block !important;
+}*/
+
+.react-tel-input .selected-flag {
+    display: flex !important;
+    align-items: center !important;
+}

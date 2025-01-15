@@ -193,7 +193,7 @@ export default class NotificationStore {
             .catch((error: Error) => console.log(error));
     }
 
-    getNotifications = async (params: PagingParams, unRead: boolean, buttonClick:boolean = false) => {
+    getNotifications = async (params: PagingParams, unRead: boolean, buttonClick: boolean = false) => {
 
         if (params.pageNumber === 1 && !buttonClick)
             this.loadingInitial = true;
@@ -208,9 +208,11 @@ export default class NotificationStore {
             const result = await agent.Notifications.list(params, unRead);
             this.newNotificationsCount = 0;
             runInAction(() => {
-                const newNotifications = result.data.filter(notification => !this.isNotificationDuplicate(notification));
-                this.notifications = this.notifications ? this.notifications.concat(newNotifications) : newNotifications;
-                this.pagination = result.pagination;
+                if (result.data.length > 0) {
+                    const newNotifications = result.data.filter(notification => !this.isNotificationDuplicate(notification));
+                    this.notifications = this.notifications ? this.notifications.concat(newNotifications) : newNotifications;
+                    this.pagination = result.pagination;
+                }
                 this.loading = false;
                 this.loadingInitial = false;
             })
