@@ -47,7 +47,8 @@ namespace API.Controllers
             token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
             var verifyUrl = $"{origin}/emails/verifyEmail?token={token}&email={email}";
-            var emailBody = $@"<html><body><p>Hello {user.UserName},</p><p>Please verify your email by clicking the link below:</p><p><a href='{verifyUrl}'>Verify Your Email</a></p></body></html>";
+            //var emailBody = $@"<html><body><p>Hello {user.UserName},</p><p>Please verify your email by clicking the link below:</p><p><a href='{verifyUrl}'>Verify Your Email</a></p></body></html>";
+            var emailBody = $@"<html><body><p>Hello {user.UserName},</p><p>Please verify your email by copying and pasting the following URL into your browser: {verifyUrl}</p></body></html>";
 
             user.Email = email;
             await _emailSender.SendEmailAsync(user, "Please verify email", emailBody);
