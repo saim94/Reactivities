@@ -91,10 +91,11 @@ namespace Infrastructure.Security
 
         private async Task DeleteCodeAsync(string email)
         {
+            var encryptedkey = _encryption.GenerateDeterministicKey($"user:{email}:code");
             var jsonContent = JsonSerializer.Serialize(new object[]
             {
                 "DEL",
-                $"user:{email}:code"
+                encryptedkey
             });
 
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
