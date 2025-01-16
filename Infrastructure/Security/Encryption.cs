@@ -15,6 +15,7 @@ namespace Infrastructure.Security
         public Encryption(IConfiguration config)
         {
             _encryptionKey = config["ENCRYPTION_KEY"];
+            Console.WriteLine("encryptionKey: " + _encryptionKey);
         }
 
         public string EncryptKey(string key)
