@@ -94,7 +94,7 @@ namespace API.Extensions
             services.AddScoped<IPhotoAccessor, PhotoAccessor>();
             services.AddScoped<EmailSender>();
             services.AddScoped<CodeValidation>();
-            services.AddSingleton<Encryption>();
+            services.AddScoped<Encryption>();
             services.Configure<CloudinarySettings>(config.GetSection("Cloudinary"));
             services.AddSignalR(o =>
             {
