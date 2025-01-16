@@ -40,7 +40,7 @@ namespace API.Controllers
             if (string.IsNullOrEmpty(origin))
             {
                 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-                origin = env == "Development" ? "https://localhost:5000/api" : "https://reactivities-pk.fly.dev/api";
+                origin = env == "Development" ? "https://localhost:5000/api" : "https://reactivities-pk.fly.dev";
             }
 
             var token = await _userManager.GenerateEmailConfirmationTokenAsync(user);
@@ -67,7 +67,7 @@ namespace API.Controllers
             if (string.IsNullOrEmpty(origin))
             {
                 var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
-                origin = env == "Development" ? "https://localhost:5000/api" : "https://reactivities-pk.fly.dev/api";
+                origin = env == "Development" ? "https://localhost:5000/api" : "https://reactivities-pk.fly.dev";
             }
 
             var token = string.Empty;
@@ -83,7 +83,9 @@ namespace API.Controllers
             token = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
 
             var resetUrl = $"{origin}/account/passwordReset?token={token}&email={email}";
-            var emailBody = $@"<html><body><p>Hi {user.UserName},</p><p>Reset your password by clicking the link below:</p><p><a href='{resetUrl}'>Reset Your Password</a></p></body></html>";
+            //var emailBody = $@"<html><body><p>Hi {user.UserName},</p><p>Reset your password by clicking the link below:</p><p><a href='{resetUrl}'>Reset Your Password</a></p></body></html>";
+            var emailBody = $@"<html><body><p>Hi {user.UserName},</p><p>Reset your password by copying and pasting the following URL into your browser: {resetUrl}</p></body></html>";
+
 
             user.Email = email;
             await _emailSender.SendEmailAsync(user, "Password reset email", emailBody);
