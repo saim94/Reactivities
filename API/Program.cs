@@ -47,7 +47,8 @@ app.UseCsp(opt => opt
     .FrameAncestors(s => s.Self())
     .ImageSources(s => s.Self()
         .CustomSources("blob:", "data:", "https://res.cloudinary.com/", "https://platform-lookaside.fbsbx.com", "https://graph.facebook.com"))
-    .ScriptSources(s => s.Self().CustomSources("https://connect.facebook.net"))
+    .ScriptSources(s => s.Self()
+        .CustomSources("https://connect.facebook.net", "https://www.google.com", "https://www.gstatic.com"))
 );
 
 if (app.Environment.IsDevelopment()) // Middleware for Swagger for Development Environment
