@@ -77,7 +77,6 @@ export default observer(function RenderNotificationsDropdown({ setIsOpen, canLoa
             return notifications.map((notification, index) => (
                 <Dropdown.Item
                     className='customDropdonwnPadding'
-                    label
                     key={index}
                 >
                     <Message floating>

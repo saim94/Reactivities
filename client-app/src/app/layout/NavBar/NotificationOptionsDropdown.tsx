@@ -50,7 +50,6 @@ export default observer(function NotificationOptionsDropdown({ index, notificati
 		>
 			<Dropdown.Menu>
 				<Dropdown.Item
-					icon
 					key="delete"
 					onClick={(e) => handleRemoveClick(e, notification.notificationId, index)}
 				>
@@ -58,7 +57,6 @@ export default observer(function NotificationOptionsDropdown({ index, notificati
 					Delete
 				</Dropdown.Item>
 				<Dropdown.Item
-					icon
 					key="markRead"
 					onClick={(e) => handleReadClick(e, notification, index)}
 				>

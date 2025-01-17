@@ -52,19 +52,17 @@ export default observer(function NotificationDropdown() {
             open={isOpen && !notificationsPageOpen}
             direction='left'
             pointing='top right'
-            icon={<div>
-                <Button basic icon="world" circular />
-                {/*{notifications && notifications.length > 0 && notifications.filter(notification => !notification.isRead).length > 0 && (*/}
-                {/*    <Label circular color='red' floating>*/}
-                {/*        {notifications.filter(notification => !notification.isRead).length}*/}
-                {/*    </Label>*/}
-                {/*)}*/}
-                {notifications && notifications.length > 0 && unreadNotificationsCount > 0 && (
-                    <Label circular color='red' floating>
-                        {unreadNotificationsCount}
-                    </Label>
-                )}
-            </div>}
+            trigger={
+                <div>
+                    <Button basic icon="world" circular />
+                    {notifications && notifications.length > 0 && unreadNotificationsCount > 0 && (
+                        <Label circular color="red" floating>
+                            {unreadNotificationsCount}
+                        </Label>
+                    )}
+                </div>
+            }
+            icon={null}
             onOpen={handleToggle}
             onClose={handleToggle}
             compact
